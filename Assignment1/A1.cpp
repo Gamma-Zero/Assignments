@@ -13,7 +13,12 @@ void Click(int event, int x, int y, int flags, void* userdata)
 }
 int main(int argc, char** argv)
 {
-	Mat img = imread("C:\\Users\\PARTH\\Desktop\\cop290 assignments\\Assignment1\\A1 Media\\traffic.jpg");
+	Mat img;
+	if (argc==1){
+		img=imread("empty.jpg");
+	} else {
+		img = imread(argv[1]);
+	}
 	if (img.empty())
 		cout << "Image is empty, cannot load image";
 	else
