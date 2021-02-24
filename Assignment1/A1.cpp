@@ -11,11 +11,11 @@ void Click(int event, int x, int y, int flags, void* userdata)
 			cor_init.push_back(Point2f(x, y));
 		}
 }
-void solve()
+
+void solve(Mat img)
 {
-	Mat img = imread("C:\\Users\\PARTH\\Desktop\\cop290 assignments\\Assignment1\\A1 media\\traffic.jpg");
 	if (img.empty())
-		cout << "Image is empty, cannot load image";
+		cout << "Image is empty, cannot load image" << endl;
 	else
 	{
 		cvtColor(img, img, COLOR_BGR2GRAY);
@@ -27,7 +27,7 @@ void solve()
 			cor_init.pop_back();
 		if (cor_init.size() < 4)
 		{
-			cout << "Need atleast 4 points to find Homography";
+			cout << "Need atleast 4 points to find Homography" << endl;
 			return;
 		}
 		cor_fin.push_back(Point2f(472, 52));
@@ -48,7 +48,14 @@ void solve()
 
 	}
 }
+
 int main(int argc, char** argv)
 {
-	solve();
+	Mat img;
+        if (argc==1){
+                img=imread("empty.jpg");
+        } else {
+                img = imread(argv[1]);
+        }
+	solve(img);
 }
