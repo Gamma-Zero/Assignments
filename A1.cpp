@@ -11,9 +11,9 @@ void Click(int event, int x, int y, int flags, void* userdata)
 			cor_init.push_back(Point2f(x, y));
 		}
 }
-int main(int argc, char** argv)
+void solve()
 {
-	Mat img = imread("C:\\Users\\PARTH\\Desktop\\cop290 assignments\\Assignment1\\A1 Media\\traffic.jpg");
+	Mat img = imread("C:\\Users\\PARTH\\Desktop\\cop290 assignments\\Assignment1\\A1 media\\traffic.jpg");
 	if (img.empty())
 		cout << "Image is empty, cannot load image";
 	else
@@ -23,13 +23,20 @@ int main(int argc, char** argv)
 		setMouseCallback("Display", Click, NULL);
 		imshow("Display", img);
 		waitKey(0);
+		while (cor_init.size() > 4)
+			cor_init.pop_back();
+		if (cor_init.size() < 4)
+		{
+			cout << "Need atleast 4 points to find Homography";
+			return;
+		}
 		cor_fin.push_back(Point2f(472, 52));
 		cor_fin.push_back(Point2f(472, 830));
 		cor_fin.push_back(Point2f(800, 830));
 		cor_fin.push_back(Point2f(800, 52));
 		Mat change = findHomography(cor_init, cor_fin);
 		Mat img_fin;
-		warpPerspective(img, img_fin, change,img.size());
+		warpPerspective(img, img_fin, change, img.size());
 		Mat img_cropped = img_fin(Rect(472, 52, 328, 778));
 		namedWindow("Transformed Image", WINDOW_NORMAL);
 		namedWindow("Cropped Image", WINDOW_NORMAL);
@@ -38,6 +45,10 @@ int main(int argc, char** argv)
 		imwrite("Transformed.jpg", img_fin);
 		imwrite("Cropped.jpg", img_cropped);
 		waitKey(0);
-		
+
 	}
+}
+int main(int argc, char** argv)
+{
+	solve();
 }
