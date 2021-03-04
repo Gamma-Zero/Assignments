@@ -1,14 +1,20 @@
-// A1_density.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
 #include <opencv2/opencv.hpp>
 #include <iostream>
-#include "C:/opencv-4.5.1/opencv/build/include/opencv2/videoio.hpp"
 using namespace cv;
 using namespace std;
+
+vector<Point2f>cor_init, cor_fin;
+void Click(int event, int x, int y, int flags, void* userdata)
+{
+    if (event == EVENT_LBUTTONDOWN)
+    {
+        cor_init.push_back(Point2f(x, y));
+    }
+}
+
 int main()
 {
     VideoCapture cap("vid.mp4");
-    Mat img = imread("C:\\Users\\PARTH\\Desktop\\cop290 assignments\\Assignment1\\empty.jpg");
     if (!cap.isOpened())
     {
         cout << "Error, cannot open the video.";
@@ -17,27 +23,34 @@ int main()
     }
     double fps = cap.get(CAP_PROP_FPS);
     cout << "Frames per seconds : " << fps << endl;
-    String name = "Traffic",name1="Queue";
-    namedWindow(name, WINDOW_NORMAL);
-    namedWindow(name1, WINDOW_NORMAL);
-    Ptr<BackgroundSubtractor> bgs= createBackgroundSubtractorMOG2();
-    Mat frame,subt;
-    //int frame_width = cap.get(CAP_PROP_FRAME_WIDTH); 
-    //int frame_height = cap.get(CAP_PROP_FRAME_HEIGHT);
-    //Size frame_size(frame_width, frame_height);
-    //VideoWriter wr("Small.mp4", VideoWriter::fourcc('M', 'P', '4', 'V'), 5, frame_size, true);
+    Ptr<BackgroundSubtractor> bgs = createBackgroundSubtractorMOG2();
+    Mat frame, subt, img;
+    cap >> img;
+
+    cvtColor(img, img, COLOR_BGR2GRAY);
+    namedWindow("Display", WINDOW_NORMAL);
+    setMouseCallback("Display", Click, NULL);
+    imshow("Display", img);
+    waitKey(0);
+    cor_fin.push_back(Point2f(472, 52));
+    cor_fin.push_back(Point2f(472, 830));
+    cor_fin.push_back(Point2f(800, 830));
+    cor_fin.push_back(Point2f(800, 52));
+    Mat change = findHomography(cor_init, cor_fin);
+    Mat crop, view;
     while (true)
     {
         bool next = cap.read(frame);
-        if (!next)
-            break;
-        next = cap.read(frame);
-        if (!next)
-            break;
+        if (!next) break;
         next = cap.read(frame);
         if (!next) break;
+        cvtColor(frame, frame, COLOR_BGR2GRAY);
+        warpPerspective(frame, frame, change, frame.size());
+        frame = frame(Rect(472, 52, 328, 778));
         bgs->apply(frame, subt, 0);
-        //wr.write(subt);
+        String name = "Traffic", name1 = "Queue";
+        namedWindow(name, WINDOW_NORMAL);
+        namedWindow(name1, WINDOW_NORMAL);
         imshow(name, frame);
         imshow(name1, subt);
         int press = waitKey(10);
@@ -46,9 +59,10 @@ int main()
             cout << "Stopping....";
             break;
         }
+        next = cap.read(frame);
+        if (!next) break;
 
     }
     cap.release();
-    //wr.release();
 
 }
