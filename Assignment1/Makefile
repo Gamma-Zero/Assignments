@@ -6,18 +6,19 @@ default:
 	python3 plotter.py
  
 build:
-	g++ A1.cpp -o A1 -pthread -std=c++11 `pkg-config --cflags --libs opencv`
+	g++ A1_density.cpp -o A1_density -pthread -std=c++11 `pkg-config --cflags --libs opencv`
 
 run:
-	./A1 $(FILENAME)
+	./A1_density $(FILENAME)
 
 clean:
-	rm A1
+	rm A1_density
 
 cleanall:
-	rm A1
-	rm Cropped.jpg
-	rm Transformed.jpg
+	rm A1_density
+	rm moving.csv
+	rm stationary.csv
+	rm stationary.png
 
 help:
 	cat README.md

@@ -24,7 +24,7 @@ int main()
     }
     double fps = cap.get(CAP_PROP_FPS);
 //    cout << "Frames per seconds : " << fps << endl;
-    Ptr<BackgroundSubtractor> bgs = createBackgroundSubtractorMOG2();
+//    Ptr<BackgroundSubtractor> bgs = createBackgroundSubtractorMOG2();
     Mat frame, subt, img, temp;
     cap >> img;
     ofstream file;
@@ -40,6 +40,7 @@ int main()
     cor_fin.push_back(Point2f(800, 52));
     Mat change = findHomography(cor_init, cor_fin);
     Mat crop, view;
+    cout << "Moving Density" << '\n';
     long long framenum=0;
     while (true)
     {
@@ -57,15 +58,16 @@ int main()
         warpPerspective(frame, frame, change, frame.size());
         frame = frame(Rect(472, 52, 328, 778));
 	absdiff(frame,temp,subt);
-	threshold(subt,subt,127,255,THRESH_BINARY);
-	dilate(subt,subt,getStructuringElement(MORPH_RECT,Size(7,7),Point(3,3)));
+	threshold(subt,subt,63,255,THRESH_BINARY);
+	dilate(subt,subt,getStructuringElement(MORPH_RECT,Size(17,17),Point(8,8)));
         String name = "Traffic", name1 = "Queue";
         namedWindow(name, WINDOW_NORMAL);
         namedWindow(name1, WINDOW_NORMAL);
         imshow(name, frame);
         imshow(name1, subt);
 	int total = subt.total();
-	file << framenum << "," << (countNonZero(subt)*1.0)/(total*1.0) << endl;
+	file << (framenum*1.0)/(15.0) << "," << (countNonZero(subt)*1.0)/(total*1.0) << endl;
+	cout << framenum << " " << (countNonZero(subt)*1.0)/(total*1.0) << endl;
         int press = waitKey(10);
         if (press == 27)
         {
@@ -81,11 +83,12 @@ int main()
     cap.release();
     destroyAllWindows();
     file.open("stationary.csv");
-    Mat empty=imread("empty.jpg");
+    Mat empty=imread("empty2.png");
     cvtColor(empty, empty, COLOR_BGR2GRAY);
     warpPerspective(empty, empty, change, empty.size());
     empty = empty(Rect(472, 52, 328, 778));
     VideoCapture cap2("vid.mp4");
+    cout << "Stationary Density" << '\n';
     framenum=0;
     while (true)
     {
@@ -99,15 +102,16 @@ int main()
         warpPerspective(frame, frame, change, frame.size());
         frame = frame(Rect(472, 52, 328, 778));
         absdiff(frame,empty,subt);
-        threshold(subt,subt,127,255,THRESH_BINARY);
-        dilate(subt,subt,getStructuringElement(MORPH_RECT,Size(7,7),Point(3,3)));
+        threshold(subt,subt,60,255,THRESH_BINARY);
+        dilate(subt,subt,getStructuringElement(MORPH_RECT,Size(5,5),Point(2,2)));
         String name = "Traffic", name1 = "Queue";
         namedWindow(name, WINDOW_NORMAL);
         namedWindow(name1, WINDOW_NORMAL);
         imshow(name, frame);
         imshow(name1, subt);
         int total = subt.total();
-        file << framenum << "," << (countNonZero(subt)*1.0)/(total*1.0) << endl;
+        file << (framenum*1.0)/(15.0) << "," << (countNonZero(subt)*1.0)/(total*1.0) << endl;
+	cout << framenum << " " << (countNonZero(subt)*1.0)/(total*1.0) << endl;
         int press = waitKey(10);
         if (press == 27)
         {
