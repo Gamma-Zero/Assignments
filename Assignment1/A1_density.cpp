@@ -13,9 +13,15 @@ void Click(int event, int x, int y, int flags, void* userdata)
     }
 }
 
-int main()
+int main(int argc, char** argv)
 {
-    VideoCapture cap("vid.mp4");
+    String path;
+    if (argc==1){
+	    path="vid.mp4";
+    } else {
+	    path=argv[1];
+    }
+    VideoCapture cap(path);
     if (!cap.isOpened())
     {
         cout << "Error, cannot open the video.";
@@ -59,7 +65,7 @@ int main()
         frame = frame(Rect(472, 52, 328, 778));
 	absdiff(frame,temp,subt);
 	threshold(subt,subt,63,255,THRESH_BINARY);
-	dilate(subt,subt,getStructuringElement(MORPH_RECT,Size(17,17),Point(8,8)));
+	dilate(subt,subt,getStructuringElement(MORPH_RECT,Size(15,15),Point(7,7)));
         String name = "Traffic", name1 = "Queue";
         namedWindow(name, WINDOW_NORMAL);
         namedWindow(name1, WINDOW_NORMAL);
@@ -102,8 +108,8 @@ int main()
         warpPerspective(frame, frame, change, frame.size());
         frame = frame(Rect(472, 52, 328, 778));
         absdiff(frame,empty,subt);
-        threshold(subt,subt,60,255,THRESH_BINARY);
-        dilate(subt,subt,getStructuringElement(MORPH_RECT,Size(5,5),Point(2,2)));
+        threshold(subt,subt,63,255,THRESH_BINARY);
+        dilate(subt,subt,getStructuringElement(MORPH_RECT,Size(7,7),Point(3,3)));
         String name = "Traffic", name1 = "Queue";
         namedWindow(name, WINDOW_NORMAL);
         namedWindow(name1, WINDOW_NORMAL);

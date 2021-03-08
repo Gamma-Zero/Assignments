@@ -22,3 +22,8 @@ cleanall:
 
 help:
 	cat README.md
+
+install:
+	sudo apt-get install python3-matplotlib
+	sudo apt install python3-pip
+	pip3 install numpy
