@@ -69,15 +69,15 @@ int main()
         normalize(magnitude, magn_norm, 0.0f, 1.0f, NORM_MINMAX);
         float a = 180, b = 360 * 255;
         angle *= a / b;
-        Mat _hsv[3], hsv, hsv8, bgr;
-        _hsv[0] = angle;
-        _hsv[1] = Mat::ones(angle.size(), CV_32F);
-        _hsv[2] = magn_norm;
-        merge(_hsv, 3, hsv);
-        hsv.convertTo(hsv8, CV_8U, 255.0);
-        cvtColor(hsv8, bgr, COLOR_HSV2BGR);
-        namedWindow("frame2", WINDOW_NORMAL);
-        imshow("frame2", bgr);
+        Mat abc[3], pqr, op, final;
+        abc[0] = angle;
+        abc[1] = Mat::ones(angle.size(), CV_32F);
+        abc[2] = magn_norm;
+        merge(abc, 3, pqr);
+        pqr.convertTo(op, CV_8U, 255.0);
+        cvtColor(op, final, COLOR_HSV2BGR);
+        namedWindow("optical_flow", WINDOW_NORMAL);
+        imshow("optical_flow", final);
 
     // --- using difference between adjacent frames
 
