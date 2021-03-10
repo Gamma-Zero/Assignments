@@ -10,6 +10,7 @@ build:
 
 run:
 	./A1_density $(FILENAME)
+	python3 plotter.py
 
 clean:
 	rm A1_density
