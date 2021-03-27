@@ -37,15 +37,15 @@ void get(int x)
     Mat crop, view;
     long long framenum = 0;
     ofstream file;
-    file.open("queue.csv");
+    file.open("stationary.csv");
     Mat empty = imread("empty2.png");
     cvtColor(empty, empty, COLOR_BGR2GRAY);
     warpPerspective(empty, empty, change, empty.size());
     empty = empty(Rect(472, 52, 328, 778));
     cout << "Queue Density" << '\n';
     cap2.read(frame);
-    bool next;
-    while (true)
+    bool next=1;
+    while (next)
     {
         cvtColor(frame, frame, COLOR_BGR2GRAY);
         warpPerspective(frame, frame, change, frame.size());
@@ -61,7 +61,7 @@ void get(int x)
         int total = subt.total();
         file << (framenum * 1.0) / (15.0) << "," << (countNonZero(subt) * 1.0) / (total * 1.0) << endl;
         cout << framenum << " " << (countNonZero(subt) * 1.0) / (total * 1.0) << endl;
-        int press = waitKey(10);
+	int press = waitKey(10);
         if (press == 27)
         {
             cout << "Stopping....";
@@ -70,7 +70,6 @@ void get(int x)
         for (int ss = 0; ss < x ; ++ss)
         {
             next = cap2.read(frame);
-            if (!next) break;
             framenum++;
         }
 
