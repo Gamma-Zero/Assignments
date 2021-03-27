@@ -37,12 +37,12 @@ void get(int x)
     Mat crop, view;
     long long framenum = 0;
     ofstream file;
-    file.open("stationary.csv");
+    file.open("queue.csv");
     Mat empty = imread("empty2.png");
     cvtColor(empty, empty, COLOR_BGR2GRAY);
     warpPerspective(empty, empty, change, empty.size());
     empty = empty(Rect(472, 52, 328, 778));
-    cout << "Stationary Density" << '\n';
+    cout << "Queue Density" << '\n';
     cap2.read(frame);
     bool next;
     while (true)
