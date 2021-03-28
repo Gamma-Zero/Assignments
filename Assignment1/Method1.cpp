@@ -95,11 +95,11 @@ int main()
     ofstream file;
     time_t start, end;
     file.open("queue.csv");
-    for (int x = 1; x <= 1; x += 5)
+    for (int x = 1; x <= 5; x += 1)
     {
         error1 = 0;
         time(&start);
-        get(1);
+        get(x);
         time(&end);
         double dur = double(end - start);
         file << error1 << "," << dur << endl;
