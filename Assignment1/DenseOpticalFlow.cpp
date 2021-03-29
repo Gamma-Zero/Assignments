@@ -41,11 +41,10 @@ void Dense()
     bool next = true;
     next = cap2.read(frame);
     framenum++;
-    Mat temp;
+    Mat temp=frame;
     double last1 = -1, last2 = -1;
     while (next)
     {
-        temp = frame;
         cvtColor(temp,temp, COLOR_BGR2GRAY);
         warpPerspective(temp,temp, change, temp.size());
         temp = temp(Rect(472, 52, 328, 778));
@@ -98,10 +97,11 @@ void Dense()
         }
         for (int i = 0; i < 2; ++i)
         {
-            next = cap2.read(frame);
+            next = cap2.read(temp);
             if (!next) break;
             framenum++;
         }
+        if (!next) break;
         last2 = last1;
         last1 = pixel1;
     }
