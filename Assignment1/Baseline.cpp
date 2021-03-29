@@ -5,13 +5,6 @@ using namespace cv;
 using namespace std;
 
 vector<Point2f>cor_init, cor_fin;
-void Click(int event, int x, int y, int flags, void* userdata)
-{
-    if (event == EVENT_LBUTTONDOWN)
-    {
-        cor_init.push_back(Point2f(x, y));
-    }
-}
 void get(int x)
 {
     VideoCapture cap2("vid.mp4");
@@ -25,10 +18,13 @@ void get(int x)
     Mat frame, subt, img, temp;
     cap2 >> img;
     cvtColor(img, img, COLOR_BGR2GRAY);
-    namedWindow("Display", WINDOW_NORMAL);
-    setMouseCallback("Display", Click, NULL);
-    imshow("Display", img);
-    waitKey(0);
+    fstream read("cor.csv");
+    string u;
+    while (getline(read,u)){
+	    int index=u.find(",");
+	    cor_init.push_back(Point2f(stoi(u.substr(0,index)),stoi(u.substr(index+1,u.size()-1-index))));
+    }
+    read.close();
     cor_fin.push_back(Point2f(472, 52));
     cor_fin.push_back(Point2f(472, 830));
     cor_fin.push_back(Point2f(800, 830));
@@ -42,9 +38,9 @@ void get(int x)
     cvtColor(empty, empty, COLOR_BGR2GRAY);
     warpPerspective(empty, empty, change, empty.size());
     empty = empty(Rect(472, 52, 328, 778));
-    cout << "Queue Density" << '\n';
     cap2.read(frame);
     bool next=1;
+    cout << "Generating Baseline..." << '\n';
     while (next)
     {
         cvtColor(frame, frame, COLOR_BGR2GRAY);
@@ -53,20 +49,19 @@ void get(int x)
         absdiff(frame, empty, subt);
         threshold(subt, subt, 60, 255, THRESH_BINARY);
         dilate(subt, subt, getStructuringElement(MORPH_RECT, Size(5, 5), Point(2, 2)));
-        String name = "Traffic", name1 = "Queue";
-        namedWindow(name, WINDOW_NORMAL);
+   /*    namedWindow(name, WINDOW_NORMAL);
         namedWindow(name1, WINDOW_NORMAL);
         imshow(name, frame);
-        imshow(name1, subt);
-        int total = subt.total();
-        file << (framenum * 1.0) / (15.0) << "," << (countNonZero(subt) * 1.0) / (total * 1.0) << endl;
-        cout << framenum << " " << (countNonZero(subt) * 1.0) / (total * 1.0) << endl;
+        imshow(name1, subt); */
+        int total = subt.total(); 
+        file << (countNonZero(subt) * 1.0) / (total * 1.0) << endl;
+/*        cout << framenum << " " << (countNonZero(subt) * 1.0) / (total * 1.0) << endl;
 	int press = waitKey(10);
         if (press == 27)
         {
             cout << "Stopping....";
             break;
-        }
+        } */
         for (int ss = 0; ss < x ; ++ss)
         {
             next = cap2.read(frame);

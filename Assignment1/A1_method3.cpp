@@ -16,14 +16,6 @@ struct pass {
 	long long ans;
 };
 
-void Click(int event, int x, int y, int flags, void* userdata)
-{
-    if (event == EVENT_LBUTTONDOWN)
-    {
-        cor_init.push_back(Point2f(x, y));
-    }
-}
-
 void* process(void* arg)
 {
 	struct pass *p=(struct pass*) arg;
@@ -48,12 +40,14 @@ int main(int argc, char *argv[])
         return 0;
     }
 	if (numthreads==1){
-	cap2 >> img;
-    cvtColor(img, img, COLOR_BGR2GRAY);
-    namedWindow("Display", WINDOW_NORMAL);
-    setMouseCallback("Display", Click, NULL);
-    imshow("Display", img);
-    waitKey(0);
+		cout << "Method 3" << '\n';
+		fstream read("cor.csv");
+    		string u;
+    		while (getline(read,u)){
+            		int index=u.find(",");
+            		cor_init.push_back(Point2f(stoi(u.substr(0,index)),stoi(u.substr(index+1,u.size()-1-index))));
+    		}
+    	read.close();
     cor_fin.push_back(Point2f(472, 52));
     cor_fin.push_back(Point2f(472, 830));
     cor_fin.push_back(Point2f(800, 830));
@@ -64,6 +58,7 @@ int main(int argc, char *argv[])
     warpPerspective(empty, empty, change, empty.size());
     empty = empty(Rect(472, 52, 328, 778));
 	}
+	cout << "Number of Threads: " << numthreads << '\n';
 	int t=778/numthreads;
     for(int i=0;i<numthreads;i++){
 	    if (i!=numthreads-1){
@@ -76,13 +71,16 @@ int main(int argc, char *argv[])
                 ep.push_back(crop);
 	}
     }
+    fstream e("stationary.csv");
+    string erf;
    bool next=1;
     pthread_t threads[numthreads];
     Mat frame;
     long long framenum=0;
     struct pass temp[numthreads];
-    time_t start,end;
-    time(&start);
+    clock_t start,end;
+    float error=0;
+    start=clock();
     while (next)
     {
 	    next = cap2.read(frame);
@@ -113,12 +111,16 @@ int main(int argc, char *argv[])
 	    	pthread_join(threads[i],NULL);
 		total+=temp[i].ans;
 	    }
+	    float value=(total*1.0)/(frame.total()*1.0);
+	    if (getline(e,erf)){
+	    	error+=pow((value-stof(erf)),2);
+	    }
 	 //   cout << framenum << " " << (total*1.0)/(frame.total()*1.0) << '\n';
     }
     cap2.release();
     cv::destroyAllWindows();
-    time(&end);
-    cout << double(end-start) << setprecision(5) << '\n';
+    end=clock();
+    cout << sqrt(error)/(framenum*1.0) << " " << float(end-start)/float(CLOCKS_PER_SEC) << setprecision(5) << '\n';
     ep.clear();
 	}
 }

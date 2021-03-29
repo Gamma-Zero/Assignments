@@ -1,12 +1,13 @@
 FILENAME="empty.jpg"
 
 default:
-	g++ A1_density.cpp -o A1_density -pthread -std=c++11 `pkg-config --cflags --libs opencv`
-	./A1_density 
-	python3 plotter.py
+	g++ A1_method4.cpp -o A1_method4 -pthread -std=c++11 `pkg-config --cflags --libs opencv`
+	./A1_method4
+	g++ A1_method3.cpp -o A1_method3 -pthread -std=c++11 `pkg-config --cflags --libs opencv`
+	./A1_method3
  
 build:
-	g++ A1_density.cpp -o A1_density -pthread -std=c++11 `pkg-config --cflags --libs opencv`
+	g++ A1_method3.cpp -o A1_method3 -pthread -std=c++11 `pkg-config --cflags --libs opencv`
 
 run:
 	./A1_density $(FILENAME)
