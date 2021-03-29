@@ -25,5 +25,4 @@ int main()
     for (int i = 0; i < cor_init.size(); ++i)
         file2 << cor_init[i].x << "," << cor_init[i].y << "\n";
     file2.close();
-
 }
