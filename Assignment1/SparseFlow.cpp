@@ -61,6 +61,8 @@ void Sparse()
     while (next)
     {
         temp = frame;
+        if (temp.empty())
+            break;
         cvtColor(temp, temp, COLOR_BGR2GRAY);
         warpPerspective(temp, temp, change, temp.size());
         temp = temp(Rect(472, 52, 328, 778));
@@ -73,23 +75,23 @@ void Sparse()
         Mat frame1 = frame;
         vector<uchar> status;
         vector<float> err;
-	goodFeaturesToTrack(temp, p0, 100, 0.3, 7, Mat(), 7, false, 0.04);
+        goodFeaturesToTrack(temp, p0, 100, 0.3, 7, Mat(), 7, false, 0.04);
         TermCriteria criteria = TermCriteria((TermCriteria::COUNT) + (TermCriteria::EPS), 10, 0.03);
         calcOpticalFlowPyrLK(temp, frame, p0, p1, status, err, Size(15, 15), 2, criteria);
-	Mat dist;
-	int total=0;
-	for (int i=0;i<p1.size();++i){
-		if (norm(p1[i]-p0[i])>6.0){
-			total++;
-		}
-	}
+        Mat dist;
+        int total = 0;
+        for (int i = 0; i < p1.size(); ++i) {
+            if (norm(p1[i] - p0[i]) > 6.0) {
+                total++;
+            }
+        }
         //threshold(bgr, bgr, 30, 255, THRESH_BINARY);
         //dilate(bgr, bgr, getStructuringElement(MORPH_RECT, Size(15, 15), Point(7, 7)));
       //  String name = "Traffic", name1 = "Queue";
       //  namedWindow(name, WINDOW_NORMAL);
       //  imshow(name, frame);
         int ftotal = frame.total();
-        double pixel = (2500.0*total)/(ftotal*1.0);
+        double pixel = (1800.0 * total) / (ftotal * 1.0);
         double pixel1 = pixel;
         if (last2 > -1)
         {
