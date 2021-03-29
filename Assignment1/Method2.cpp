@@ -12,7 +12,7 @@ void Click(int event, int x, int y, int flags, void* userdata)
         cor_init.push_back(Point2f(x, y));
     }
 }
-void get(int x,int y)
+void get(int x, int y)
 {
     VideoCapture cap2("vid.mp4");
     if (!cap2.isOpened())
@@ -23,7 +23,7 @@ void get(int x,int y)
     }
     double fps = cap2.get(CAP_PROP_FPS);
     Mat frame, subt, img, change;
-    if (x == 1)
+    if (x == 192)
     {
         cap2 >> img;
         cvtColor(img, img, COLOR_BGR2GRAY);
@@ -38,6 +38,7 @@ void get(int x,int y)
     cvtColor(empty, empty, COLOR_BGR2GRAY);
     warpPerspective(empty, empty, change, empty.size());
     empty = empty(Rect(472, 52, 328, 778));
+    resize(empty,empty, Size(x, y));
     cout << "Queue Density" << '\n';
     bool next = true;
     while (next)
@@ -46,10 +47,10 @@ void get(int x,int y)
         if (!next) break;
         framenum++;
         if (framenum > 300) break;
-        //resize(frame1, frame, Size(x, y));
         cvtColor(frame, frame, COLOR_BGR2GRAY);
         warpPerspective(frame, frame, change, frame.size());
         frame = frame(Rect(472, 52, 328, 778));
+        resize(frame, frame, Size(x, y));
         absdiff(frame, empty, subt);
         threshold(subt, subt, 60, 255, THRESH_BINARY);
         dilate(subt, subt, getStructuringElement(MORPH_RECT, Size(5, 5), Point(2, 2)));
@@ -98,14 +99,13 @@ int main()
     time_t start, end;
     file.open("queue.csv");
     vector<pair<int, int>>v;
-    v.push_back({ 30,30 });
-    //v.push_back({ 700,360 });
-    v.push_back({ 20,10 });
-    for (int x = 1; x <= 2;++x)
+    int a = 192, b = 108;
+    for (int x = 1; x <= 1; ++x)
     {
+        a /= x;
         error1 = 0;
         time(&start);
-        get(1,1);
+        get(a,b);
         time(&end);
         double dur = double(end - start);
         file << error1 << "," << dur << endl;
