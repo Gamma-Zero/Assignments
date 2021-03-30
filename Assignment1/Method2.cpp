@@ -5,13 +5,7 @@ using namespace std;
 vector<Point2f>cor_init, cor_fin;
 double error1 = 0;
 vector<double>baseline;
-void Click(int event, int x, int y, int flags, void* userdata)
-{
-    if (event == EVENT_LBUTTONDOWN)
-    {
-        cor_init.push_back(Point2f(x, y));
-    }
-}
+long long framenum;
 void get(int x, int y)
 {
     VideoCapture cap2("vid.mp4");
@@ -23,30 +17,33 @@ void get(int x, int y)
     }
     double fps = cap2.get(CAP_PROP_FPS);
     Mat frame, subt, img, change;
-    if (x == 192)
+    if (x == 328 && y == 778)
     {
-        cap2 >> img;
-        cvtColor(img, img, COLOR_BGR2GRAY);
-        namedWindow("Display", WINDOW_NORMAL);
-        setMouseCallback("Display", Click, NULL);
-        imshow("Display", img);
-        waitKey(0);
+	    cout << "Method 2" << '\n';
+                fstream read("cor.csv");
+                string u;
+                while (getline(read,u)){
+                        int index=u.find(",");
+                        cor_init.push_back(Point2f(stoi(u.substr(0,index)),stoi(u.substr(index+1,u.size()-1-index))));
+                }
+        read.close();
     }
+    cout << "Resolution: " << x << "X" << y << '\n';
     change = findHomography(cor_init, cor_fin);
-    long long framenum = 0;
+    framenum = 0;
     Mat empty = imread("empty2.png");
     cvtColor(empty, empty, COLOR_BGR2GRAY);
     warpPerspective(empty, empty, change, empty.size());
     empty = empty(Rect(472, 52, 328, 778));
     resize(empty,empty, Size(x, y));
-    cout << "Queue Density" << '\n';
+    fstream e("stationary.csv");
+    string erf;
     bool next = true;
     while (next)
     {
         next = cap2.read(frame);
         if (!next) break;
         framenum++;
-        if (framenum > 300) break;
         cvtColor(frame, frame, COLOR_BGR2GRAY);
         warpPerspective(frame, frame, change, frame.size());
         frame = frame(Rect(472, 52, 328, 778));
@@ -54,27 +51,15 @@ void get(int x, int y)
         absdiff(frame, empty, subt);
         threshold(subt, subt, 60, 255, THRESH_BINARY);
         dilate(subt, subt, getStructuringElement(MORPH_RECT, Size(5, 5), Point(2, 2)));
-        String name = "Traffic", name1 = "Queue";
-        namedWindow(name, WINDOW_NORMAL);
-        namedWindow(name1, WINDOW_NORMAL);
-        imshow(name, frame);
-        imshow(name1, subt);
         int total = subt.total();
         double pixel = (countNonZero(subt) * 1.0) / (total * 1.0);
-        error1 += abs(baseline[framenum] - pixel);
-        cout << framenum << " " << pixel << endl;
-        int press = waitKey(10);
-        if (press == 27)
-        {
-            cout << "Stopping....";
-            break;
-        }
+	if (getline(e,erf)){
+                error1+=pow((pixel-stod(erf)),2);
+            }
         if (!next) break;
-
     }
     cap2.release();
     destroyAllWindows();
-    error1 /= framenum;
     return;
 }
 
@@ -84,32 +69,25 @@ int main()
     cor_fin.push_back(Point2f(472, 830));
     cor_fin.push_back(Point2f(800, 830));
     cor_fin.push_back(Point2f(800, 52));
-    ofstream file;
+    ofstream file("m2.csv");
     fstream file1;
-    file1.open("stationary.csv");
     string temp, curline, word;
-    while (file1 >> temp)
-    {
-        reverse(temp.begin(), temp.end());
-        while (temp.back() != ',') temp.pop_back();
-        temp.pop_back();
-        reverse(temp.begin(), temp.end());
-        baseline.push_back(stod(temp));
-    }
-    time_t start, end;
-    file.open("queue.csv");
+    clock_t start, end;
     vector<pair<int, int>>v;
-    int a = 192, b = 108;
-    for (int x = 1; x <= 1; ++x)
+    v.push_back({328,778});
+    v.push_back({300,700});
+    v.push_back({300,500});
+    v.push_back({200,700});
+    v.push_back({200,500});
+    for (auto i:v)
     {
-        a /= x;
         error1 = 0;
-        time(&start);
-        get(a,b);
-        time(&end);
-        double dur = double(end - start);
-        file << error1 << "," << dur << endl;
+        start=clock();
+        get(i.first,i.second);
+        end=clock();
+        double dur = double(end - start)/double(CLOCKS_PER_SEC);
+	cout << sqrt(error1)/(framenum*1.0) << " " << dur << setprecision(5) << '\n';
+	file << sqrt(error1)/(framenum*1.0) << " " << dur << setprecision(5) << '\n';
     }
     file.close();
-    file1.close();
 }

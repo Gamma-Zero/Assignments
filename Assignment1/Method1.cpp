@@ -5,14 +5,7 @@ using namespace cv;
 using namespace std;
 vector<Point2f>cor_init, cor_fin;
 double error1 = 0;
-vector<double>baseline(1, 0);
-void Click(int event, int x, int y, int flags, void* userdata)
-{
-    if (event == EVENT_LBUTTONDOWN)
-    {
-        cor_init.push_back(Point2f(x, y));
-    }
-}
+long long framenum;
 void get(int x)
 {
     VideoCapture cap2("vid.mp4");
@@ -26,25 +19,29 @@ void get(int x)
     Mat frame, subt, img, change;
     if (x == 1)
     {
-        cap2 >> img;
-        cvtColor(img, img, COLOR_BGR2GRAY);
-        namedWindow("Display", WINDOW_NORMAL);
-        setMouseCallback("Display", Click, NULL);
-        imshow("Display", img);
-        waitKey(0);
+	cout << "Method 1" << '\n';
+                fstream read("cor.csv");
+                string u;
+                while (getline(read,u)){
+                        int index=u.find(",");
+                        cor_init.push_back(Point2f(stoi(u.substr(0,index)),stoi(u.substr(index+1,u.size()-1-index))));
+                }
+        read.close();
         cor_fin.push_back(Point2f(472, 52));
         cor_fin.push_back(Point2f(472, 830));
         cor_fin.push_back(Point2f(800, 830));
         cor_fin.push_back(Point2f(800, 52));
     }
     change = findHomography(cor_init, cor_fin);
-    long long framenum = 0;
+    framenum = 0;
     Mat empty = imread("empty2.png");
     cvtColor(empty, empty, COLOR_BGR2GRAY);
     warpPerspective(empty, empty, change, empty.size());
     empty = empty(Rect(472, 52, 328, 778));
-    cout << "Queue Density" << '\n';
     bool next=true;
+    cout << "Frames skipped: " << x << '\n';
+    fstream e("stationary.csv");
+    string erf;
     while (next)
     {
         next = cap2.read(frame);
@@ -56,53 +53,41 @@ void get(int x)
         absdiff(frame, empty, subt);
         threshold(subt, subt, 60, 255, THRESH_BINARY);
         dilate(subt, subt, getStructuringElement(MORPH_RECT, Size(5, 5), Point(2, 2)));
-        String name = "Traffic", name1 = "Queue";
-        namedWindow(name, WINDOW_NORMAL);
-        namedWindow(name1, WINDOW_NORMAL);
-        imshow(name, frame);
-        imshow(name1, subt);
         int total = subt.total();
         double pixel = (countNonZero(subt) * 1.0) / (total * 1.0);
-        if (x == 1)
-            baseline.push_back(pixel);
-        error1 += abs(baseline[framenum] - pixel);
-        //file << (framenum * 1.0) / (15.0) << "," << pixel << endl;
-        cout << framenum << " " << pixel << endl;
-        int press = waitKey(10);
-        if (press == 27)
-        {
-            cout << "Stopping....";
-            break;
-        }
+        if (getline(e,erf)){
+                error1+=pow((pixel-stof(erf)),2);
+            }
         for (int ss = 1; ss < x; ++ss)
         {
             next = cap2.read(frame);
             if (!next) break;
             framenum++;
-            error1 += abs(pixel-baseline[framenum]);
+        if (getline(e,erf)){
+                error1+=pow((pixel-stof(erf)),2);
+            }
         }
         if (!next) break;
 
     }
     cap2.release();
     destroyAllWindows();
-    error1 /= framenum;
     return ;
 }
 
 int main()
 {
-    ofstream file;
-    time_t start, end;
-    file.open("queue.csv");
-    for (int x = 1; x <= 5; x += 1)
+    ofstream file("m1.csv");
+    clock_t start, end;
+    for (int x = 1; x <= 10; x += 1)
     {
         error1 = 0;
-        time(&start);
+        start=clock();
         get(x);
-        time(&end);
-        double dur = double(end - start);
-        file << error1 << "," << dur << endl;
+        end=clock();
+        double dur = double(end - start)/double(CLOCKS_PER_SEC);
+	cout << sqrt(error1)/(framenum*1.0) << " " << dur << setprecision(5) << '\n';
+	file << sqrt(error1)/(framenum*1.0) << " " << dur << setprecision(5) << '\n';
     }
     file.close();
 }
