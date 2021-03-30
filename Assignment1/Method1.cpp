@@ -1,6 +1,8 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <fstream>
+#include <chrono>
+typedef std::chrono::high_resolution_clock Clock;
 using namespace cv;
 using namespace std;
 vector<Point2f>cor_init, cor_fin;
@@ -78,14 +80,13 @@ void get(int x)
 int main()
 {
     ofstream file("m1.csv");
-    clock_t start, end;
     for (int x = 1; x <= 10; x += 1)
     {
         error1 = 0;
-        start=clock();
+        auto start=Clock::now();
         get(x);
-        end=clock();
-        double dur = double(end - start)/double(CLOCKS_PER_SEC);
+        auto end=Clock::now();
+        auto dur=std::chrono::duration_cast<std::chrono::nanoseconds>(end-start).count()/pow(10,9);
 	cout << sqrt(error1)/(framenum*1.0) << " " << dur << setprecision(5) << '\n';
 	file << sqrt(error1)/(framenum*1.0) << "," << dur << setprecision(5) << '\n';
     }

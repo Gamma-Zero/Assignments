@@ -16,8 +16,6 @@ void get(int x)
     }
     double fps = cap2.get(CAP_PROP_FPS);
     Mat frame, subt, img, temp;
-    cap2 >> img;
-    cvtColor(img, img, COLOR_BGR2GRAY);
     fstream read("cor.csv");
     string u;
     while (getline(read,u)){

@@ -2,6 +2,8 @@
 #include <iostream>
 #include <fstream>
 #include "pthread.h"
+#include <chrono>
+typedef std::chrono::high_resolution_clock Clock;
 using namespace cv;
 using namespace std;
 int numthreads;
@@ -69,9 +71,8 @@ int main(int argc, char *argv[])
     Mat frame;
     long long framenum=0;
     struct pass temp[numthreads];
-    clock_t start,end;
     float error=0;
-    start=clock();
+    auto start=Clock::now();
     while (next)
     {
 	    int done=0;
@@ -93,11 +94,12 @@ int main(int argc, char *argv[])
             	}
 	    }
     }
+    auto end=Clock::now();
+    auto dur=std::chrono::duration_cast<std::chrono::nanoseconds>(end-start).count()/pow(10,9);
+    cout << sqrt(error)/(framenum*1.0) << " " << dur << setprecision(5) << '\n';
+    file << sqrt(error)/(framenum*1.0) << "," << dur << setprecision(5) << '\n';
     cap2.release();
     cv::destroyAllWindows();
-    end=clock();
-    cout << sqrt(error)/(framenum*1.0) << " " << float(end-start)/float(CLOCKS_PER_SEC) << setprecision(5) << '\n';
-    file << sqrt(error)/(framenum*1.0) << "," << float(end-start)/float(CLOCKS_PER_SEC) << setprecision(5) << '\n';
 	}
 	file.close();
 }
