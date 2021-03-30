@@ -87,7 +87,7 @@ int main()
         end=clock();
         double dur = double(end - start)/double(CLOCKS_PER_SEC);
 	cout << sqrt(error1)/(framenum*1.0) << " " << dur << setprecision(5) << '\n';
-	file << sqrt(error1)/(framenum*1.0) << " " << dur << setprecision(5) << '\n';
+	file << sqrt(error1)/(framenum*1.0) << "," << dur << setprecision(5) << '\n';
     }
     file.close();
 }
