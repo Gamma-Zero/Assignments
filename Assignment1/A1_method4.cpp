@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
     cv::destroyAllWindows();
     end=clock();
     cout << sqrt(error)/(framenum*1.0) << " " << float(end-start)/float(CLOCKS_PER_SEC) << setprecision(5) << '\n';
-    file << sqrt(error)/(framenum*1.0) << " " << float(end-start)/float(CLOCKS_PER_SEC) << setprecision(5) << '\n';
+    file << sqrt(error)/(framenum*1.0) << "," << float(end-start)/float(CLOCKS_PER_SEC) << setprecision(5) << '\n';
 	}
 	file.close();
 }

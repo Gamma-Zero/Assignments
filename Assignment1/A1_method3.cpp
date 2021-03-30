@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
     }
     end=clock();
     cout << sqrt(error)/(framenum*1.0) << " " << float(end-start)/float(CLOCKS_PER_SEC) << setprecision(5) << '\n';
-    file << sqrt(error)/(framenum*1.0) << " " << float(end-start)/float(CLOCKS_PER_SEC) << setprecision(5) << '\n';
+    file << sqrt(error)/(framenum*1.0) << "," << float(end-start)/float(CLOCKS_PER_SEC) << setprecision(5) << '\n';
     cap2.release();
     cv::destroyAllWindows();
     ep.clear();
