@@ -2,13 +2,14 @@
 #include <iostream>
 #include <fstream>
 #include "pthread.h"
+#include <bits/stdc++.h>
 using namespace cv;
 using namespace std;
 int numthreads;
 vector<Point2f>cor_init, cor_fin;
 Mat img, temp, change, crop, view, empty;
-ofstream file;
 vector<Mat> ep;
+vector<pair<double,float>> s;
 
 struct pass {
 	Mat frame;
@@ -31,7 +32,7 @@ void* process(void* arg)
 
 int main(int argc, char *argv[])
 {
-	fstream file("m3.csv"); 
+	ofstream file("m3.csv");
 	for (numthreads=1;numthreads<=8;numthreads++){
 	VideoCapture cap2("vid.mp4");
 	if (!cap2.isOpened())
@@ -118,11 +119,11 @@ int main(int argc, char *argv[])
 	    }
 	 //   cout << framenum << " " << (total*1.0)/(frame.total()*1.0) << '\n';
     }
-    cap2.release();
-    cv::destroyAllWindows();
     end=clock();
     cout << sqrt(error)/(framenum*1.0) << " " << float(end-start)/float(CLOCKS_PER_SEC) << setprecision(5) << '\n';
     file << sqrt(error)/(framenum*1.0) << " " << float(end-start)/float(CLOCKS_PER_SEC) << setprecision(5) << '\n';
+    cap2.release();
+    cv::destroyAllWindows();
     ep.clear();
 	}
 	file.close();

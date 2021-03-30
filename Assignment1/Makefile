@@ -1,26 +1,30 @@
 FILENAME="empty.jpg"
 
 default:
+	g++ Method1.cpp -o Method1 -pthread -std=c++11 `pkg-config --cflags --libs opencv`
+	./Method1
+	g++ Method2.cpp -o Method2 -pthread -std=c++11 `pkg-config --cflags --libs opencv`
+	./Method2
 	g++ A1_method4.cpp -o A1_method4 -pthread -std=c++11 `pkg-config --cflags --libs opencv`
 	./A1_method4
 	g++ A1_method3.cpp -o A1_method3 -pthread -std=c++11 `pkg-config --cflags --libs opencv`
 	./A1_method3
  
-build:
+run1:
+	g++ Method1.cpp -o Method1 -pthread -std=c++11 `pkg-config --cflags --libs opencv`
+	./Method1
+
+run2:
+	g++ Method1.cpp -o Method1 -pthread -std=c++11 `pkg-config --cflags --libs opencv`
+	./Method1
+
+run3:
 	g++ A1_method3.cpp -o A1_method3 -pthread -std=c++11 `pkg-config --cflags --libs opencv`
+	./A1_method3
 
-run:
-	./A1_density $(FILENAME)
-	python3 plotter.py
-
-clean:
-	rm A1_density
-
-cleanall:
-	rm A1_density
-	rm moving.csv
-	rm stationary.csv
-	rm stationary.png
+run4:
+	g++ A1_method4.cpp -o A1_method4 -pthread -std=c++11 `pkg-config --cflags --libs opencv`
+	./A1_method4
 
 help:
 	cat README.md

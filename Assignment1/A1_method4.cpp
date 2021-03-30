@@ -7,7 +7,6 @@ using namespace std;
 int numthreads;
 vector<Point2f>cor_init, cor_fin;
 Mat img, temp, change, crop, view, empty;
-ofstream file;
 
 struct pass {
 	Mat frame;
@@ -34,7 +33,7 @@ void* process(void* arg)
 
 int main(int argc, char *argv[])
 {
-	fstream file("m4.csv");
+	ofstream file("m4.csv");
 	for (numthreads=1;numthreads<=8;numthreads++){
 	VideoCapture cap2("vid.mp4");
 	if (!cap2.isOpened())
