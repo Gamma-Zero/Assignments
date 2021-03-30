@@ -33,13 +33,14 @@ void Sparse()
         return;
     }
     double fps = cap2.get(CAP_PROP_FPS);
-    Mat frame, subt, img, change;
-    cap2 >> img;
-    cvtColor(img, img, COLOR_BGR2GRAY);
-    namedWindow("Display", WINDOW_NORMAL);
-    setMouseCallback("Display", Click, NULL);
-    imshow("Display", img);
-    waitKey(0);
+    Mat frame, subt, change;
+    fstream read("cor.csv");
+    string u;
+    while (getline(read, u)) {
+        int index = u.find(",");
+        cor_init.push_back(Point2f(stoi(u.substr(0, index)), stoi(u.substr(index + 1, u.size() - 1 - index))));
+    }
+    read.close();
     change = findHomography(cor_init, cor_fin);
     long long framenum = 0;
     Mat empty = imread("empty2.png");
@@ -57,22 +58,14 @@ void Sparse()
     warpPerspective(temp, temp, change, temp.size());
     temp = temp(Rect(472, 52, 328, 778));
     Mat mask = Mat::zeros(temp.size(), temp.type());
-
     while (next)
     {
-        temp = frame;
-        if (temp.empty())
-            break;
-        cvtColor(temp, temp, COLOR_BGR2GRAY);
-        warpPerspective(temp, temp, change, temp.size());
-        temp = temp(Rect(472, 52, 328, 778));
         bool next = cap2.read(frame);
         if (!next) break;
         framenum++;
         cvtColor(frame, frame, COLOR_BGR2GRAY);
         warpPerspective(frame, frame, change, frame.size());
         frame = frame(Rect(472, 52, 328, 778));
-        Mat frame1 = frame;
         vector<uchar> status;
         vector<float> err;
         goodFeaturesToTrack(temp, p0, 100, 0.3, 7, Mat(), 7, false, 0.04);
@@ -107,14 +100,11 @@ void Sparse()
             cout << "Stopping....";
             break;
         }
-        for (int i = 0; i < 2; ++i)
-        {
-            next = cap2.read(frame);
-            if (!next) break;
-            framenum++;
-        }
         last2 = last1;
         last1 = pixel1;
+        temp = frame;
+        if (temp.empty())
+            break;
     }
     cap2.release();
     destroyAllWindows();
