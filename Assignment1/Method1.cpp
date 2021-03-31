@@ -29,7 +29,7 @@ void get(int x, string y)
 	warpPerspective(empty, empty, change, empty.size());
 	empty = empty(Rect(472, 52, 328, 778));
 	bool next = true;
-	cout << "Frames skipping parameter x= : " << x << '\n';
+	cout << "Frames skipped: " << x-1 << '\n';
 	fstream e("stationary.csv");
 	string erf;
 	while (next)
@@ -85,7 +85,8 @@ int main(int argc, char** argv)
 	cor_fin.push_back(Point2f(800, 830));
 	cor_fin.push_back(Point2f(800, 52));
 	ofstream file("m1.csv");
-	for (int x = 1; x <= 10; x += 1)
+	vector<int> values={1,2,3,4,5,6,7,8,16,20};
+	for (auto x:values)
 	{
 		error1 = 0;
 		auto start = Clock::now();
@@ -101,7 +102,7 @@ int main(int argc, char** argv)
 		auto end = Clock::now();
 		auto dur = std::chrono::duration_cast<std::chrono::nanoseconds> (end - start).count() / pow(10, 9);
 		cout << sqrt(error1 / framenum * 1.0) << " " << dur << setprecision(5) << '\n';
-		file << sqrt(error1 / framenum * 1.0) << "," << dur << setprecision(5) << '\n';
+		file << sqrt(error1 / framenum * 1.0) << "," << dur << "," << x << setprecision(5) << '\n';
 	}
 
 	file.close();

@@ -8,6 +8,7 @@ using namespace std;
 vector<Point2f> cor_init, cor_fin;
 double error1 = 0;
 long long framenum;
+
 void get(float x, float y, string z)
 {
 	VideoCapture cap2(z);
@@ -20,15 +21,14 @@ void get(float x, float y, string z)
 
 	double fps = cap2.get(CAP_PROP_FPS);
 	Mat frame, subt, img, change;
-
-	cout << "Resolution: " << x << "X" << y << '\n';
+	cout << "Resolution: " << int(x*328) << "X" << int(y*778) << '\n';
 	change = findHomography(cor_init, cor_fin);
 	framenum = 0;
 	Mat empty = imread("empty2.png");
 	cvtColor(empty, empty, COLOR_BGR2GRAY);
 	warpPerspective(empty, empty, change, empty.size());
 	empty = empty(Rect(472, 52, 328, 778));
-	resize(empty, empty, Size(), x, y);
+	resize(empty, empty, Size(),x,y);
 	fstream e("stationary.csv");
 	string erf;
 	bool next = true;
@@ -40,7 +40,8 @@ void get(float x, float y, string z)
 		cvtColor(frame, frame, COLOR_BGR2GRAY);
 		warpPerspective(frame, frame, change, frame.size());
 		frame = frame(Rect(472, 52, 328, 778));
-		resize(frame, frame, Size(), x, y);
+		Mat frame1=frame.clone();
+		resize(frame1, frame, Size(),x,y);
 		absdiff(frame, empty, subt);
 		threshold(subt, subt, 60, 255, THRESH_BINARY);
 		dilate(subt, subt, getStructuringElement(MORPH_RECT, Size(5, 5), Point(2, 2)));
@@ -78,11 +79,11 @@ int main(int argc, char** argv)
 	ofstream file("m2.csv");
 	fstream file1;
 	string temp, curline, word;
-	vector<pair<float,float>> v;
+	vector<pair<float, float>> v;
 	v.push_back({ 1.0,1.0 });
-	v.push_back({ 0.8,1.0 });
 	v.push_back({ 0.8,0.8 });
-	v.push_back({ 0.8,0.6 });
+	v.push_back({ 0.7,0.7 });
+	v.push_back({ 0.6,0.6 });
 	v.push_back({ 0.5,0.5 });
 	for (auto i : v)
 	{
@@ -100,7 +101,7 @@ int main(int argc, char** argv)
 		auto end = Clock::now();
 		auto dur = std::chrono::duration_cast<std::chrono::nanoseconds> (end - start).count() / pow(10, 9);
 		cout << sqrt(error1 / framenum * 1.0) << " " << dur << setprecision(5) << '\n';
-		file << sqrt(error1 / framenum * 1.0) << "," << dur << setprecision(5) << endl;
+		file << sqrt(error1 / framenum * 1.0) << "," << dur << "," << i*i << setprecision(5) << '\n';
 	}
 
 	file.close();
