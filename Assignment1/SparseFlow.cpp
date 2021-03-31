@@ -14,7 +14,7 @@ void Click(int event, int x, int y, int flags, void* userdata)
         cor_init.push_back(Point2f(x, y));
     }
 }
-void Sparse()
+void Sparse(string pq)
 {
     vector<Scalar> colors;
     RNG rng;
@@ -25,7 +25,7 @@ void Sparse()
         int b = rng.uniform(0, 256);
         colors.push_back(Scalar(r, g, b));
     }
-    VideoCapture cap2("vid.mp4");
+    VideoCapture cap2(pq);
     if (!cap2.isOpened())
     {
         cout << "Error, cannot open the video.";
@@ -58,6 +58,8 @@ void Sparse()
     warpPerspective(temp, temp, change, temp.size());
     temp = temp(Rect(472, 52, 328, 778));
     Mat mask = Mat::zeros(temp.size(), temp.type());
+    fstream e("dense.csv");
+    string erf;
     while (next)
     {
         bool next = cap2.read(frame);
@@ -92,8 +94,13 @@ void Sparse()
             pixel += last2;
             pixel /= 3;
         }
-        cout << framenum << " " << pixel << "\n";
-        file << (framenum * 1.0) / (15.0) << "," << pixel << endl;
+        //cout << framenum << " " << pixel << "\n";
+        if (getline(e, erf))
+        {
+            int index=erf.find(',');
+            double val = stod(erf.substr(index + 1, erf.size() - 1 - index));
+            error1 += pow(val - pixel, 2);
+        }
         int press = waitKey(10);
         if (press == 27)
         {
@@ -112,14 +119,22 @@ void Sparse()
     return;
 }
 
-int main()
+int main(int argc, char** argv)
 {
     cor_fin.push_back(Point2f(472, 52));
     cor_fin.push_back(Point2f(472, 830));
     cor_fin.push_back(Point2f(800, 830));
     cor_fin.push_back(Point2f(800, 52));
     time_t start, end;
-    file.open("dynamic.csv");
-    Sparse();
+    file.open("sparse.txt");
+    if (argc == 1)
+    {
+        Sparse("vid.mp4");
+    }
+    else
+    {
+        Sparse(argv[1]);
+    }
+    file << sqrt(error1) << endl;
     file.close();
 }
