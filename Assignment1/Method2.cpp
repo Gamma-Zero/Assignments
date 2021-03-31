@@ -28,7 +28,7 @@ void get(float x, float y, string z)
 	cvtColor(empty, empty, COLOR_BGR2GRAY);
 	warpPerspective(empty, empty, change, empty.size());
 	empty = empty(Rect(472, 52, 328, 778));
-	resize(empty, empty, Size(),x,y);
+	resize(empty, empty, Size(), x, y);
 	fstream e("stationary.csv");
 	string erf;
 	bool next = true;
@@ -40,7 +40,7 @@ void get(float x, float y, string z)
 		cvtColor(frame, frame, COLOR_BGR2GRAY);
 		warpPerspective(frame, frame, change, frame.size());
 		frame = frame(Rect(472, 52, 328, 778));
-		resize(frame, frame, Size(),x,y);
+		resize(frame, frame, Size(), x, y);
 		absdiff(frame, empty, subt);
 		threshold(subt, subt, 60, 255, THRESH_BINARY);
 		dilate(subt, subt, getStructuringElement(MORPH_RECT, Size(5, 5), Point(2, 2)));
@@ -78,7 +78,7 @@ int main(int argc, char** argv)
 	ofstream file("m2.csv");
 	fstream file1;
 	string temp, curline, word;
-	vector<pair<int, int>> v;
+	vector<pair<float,float>> v;
 	v.push_back({ 1.0,1.0 });
 	v.push_back({ 0.8,1.0 });
 	v.push_back({ 0.8,0.8 });
@@ -100,7 +100,7 @@ int main(int argc, char** argv)
 		auto end = Clock::now();
 		auto dur = std::chrono::duration_cast<std::chrono::nanoseconds> (end - start).count() / pow(10, 9);
 		cout << sqrt(error1 / framenum * 1.0) << " " << dur << setprecision(5) << '\n';
-		file << sqrt(error1 / framenum * 1.0) << "," << dur << setprecision(5) << '\n';
+		file << sqrt(error1 / framenum * 1.0) << "," << dur << setprecision(5) << endl;
 	}
 
 	file.close();
