@@ -21,23 +21,6 @@ void get(int x, string y)
 
 	double fps = cap2.get(CAP_PROP_FPS);
 	Mat frame, subt, img, change;
-	if (x == 1)
-	{
-		cout << "Method 1" << '\n';
-		fstream read("cor.csv");
-		string u;
-		while (getline(read, u))
-		{
-			int index = u.find(",");
-			cor_init.push_back(Point2f(stoi(u.substr(0, index)), stoi(u.substr(index + 1, u.size() - 1 - index))));
-		}
-
-		read.close();
-		cor_fin.push_back(Point2f(472, 52));
-		cor_fin.push_back(Point2f(472, 830));
-		cor_fin.push_back(Point2f(800, 830));
-		cor_fin.push_back(Point2f(800, 52));
-	}
 
 	change = findHomography(cor_init, cor_fin);
 	framenum = 0;
@@ -46,7 +29,7 @@ void get(int x, string y)
 	warpPerspective(empty, empty, change, empty.size());
 	empty = empty(Rect(472, 52, 328, 778));
 	bool next = true;
-	cout << "Frames skipped: " << x << '\n';
+	cout << "Frames skipping parameter x= : " << x << '\n';
 	fstream e("stationary.csv");
 	string erf;
 	while (next)
@@ -61,7 +44,7 @@ void get(int x, string y)
 		threshold(subt, subt, 60, 255, THRESH_BINARY);
 		dilate(subt, subt, getStructuringElement(MORPH_RECT, Size(5, 5), Point(2, 2)));
 		int total = subt.total();
-		double pixel = (countNonZero(subt) *1.0) / (total *1.0);
+		double pixel = (countNonZero(subt) * 1.0) / (total * 1.0);
 		if (getline(e, erf))
 		{
 			error1 += pow((pixel - stof(erf)), 2);
@@ -87,8 +70,20 @@ void get(int x, string y)
 	return;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
+	fstream read("cor.csv");
+	string u;
+	while (getline(read, u))
+	{
+		int index = u.find(",");
+		cor_init.push_back(Point2f(stoi(u.substr(0, index)), stoi(u.substr(index + 1, u.size() - 1 - index))));
+	}
+	read.close();
+	cor_fin.push_back(Point2f(472, 52));
+	cor_fin.push_back(Point2f(472, 830));
+	cor_fin.push_back(Point2f(800, 830));
+	cor_fin.push_back(Point2f(800, 52));
 	ofstream file("m1.csv");
 	for (int x = 1; x <= 10; x += 1)
 	{
@@ -96,7 +91,7 @@ int main(int argc, char **argv)
 		auto start = Clock::now();
 		if (argc == 1)
 		{
-			get(x, "vid.mp4");
+			get(x, "abc.mp4");
 		}
 		else
 		{
@@ -104,9 +99,9 @@ int main(int argc, char **argv)
 		}
 
 		auto end = Clock::now();
-		auto dur = std::chrono::duration_cast<std::chrono::nanoseconds > (end - start).count() / pow(10, 9);
-		cout << sqrt(error1 / framenum *1.0) << " " << dur << setprecision(5) << '\n';
-		file << sqrt(error1 / framenum *1.0) << "," << dur << setprecision(5) << '\n';
+		auto dur = std::chrono::duration_cast<std::chrono::nanoseconds> (end - start).count() / pow(10, 9);
+		cout << sqrt(error1 / framenum * 1.0) << " " << dur << setprecision(5) << '\n';
+		file << sqrt(error1 / framenum * 1.0) << "," << dur << setprecision(5) << '\n';
 	}
 
 	file.close();
