@@ -86,6 +86,8 @@ cleanall:
 	rm Method2
 	rm Method3
 	rm Method4
+	rm cor.csv
+	rm stationary.csv
 	rm m1.csv
 	rm m2.csv
 	rm m3.csv
