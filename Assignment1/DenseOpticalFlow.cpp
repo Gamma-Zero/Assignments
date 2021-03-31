@@ -3,10 +3,8 @@
 using namespace cv;
 using namespace std;
 vector<Point2f>cor_init, cor_fin;
-double error1 = 0;
 vector<double>baseline;
 ofstream file;
-ofstream file1;
 void Click(int event, int x, int y, int flags, void* userdata)
 {
     if (event == EVENT_LBUTTONDOWN)
@@ -14,9 +12,9 @@ void Click(int event, int x, int y, int flags, void* userdata)
         cor_init.push_back(Point2f(x, y));
     }
 }
-void Dense()
+void Dense(string pq)
 {
-    VideoCapture cap2("abc.mp4");
+    VideoCapture cap2(pq);
     if (!cap2.isOpened())
     {
         cout << "Error, cannot open the video.";
@@ -101,11 +99,10 @@ void Dense()
     }
     cap2.release();
     destroyAllWindows();
-    error1 /= framenum;
     return;
 }
 
-int main()
+int main(int argc, char** argv)
 {
     cor_fin.push_back(Point2f(472, 52));
     cor_fin.push_back(Point2f(472, 830));
@@ -113,6 +110,9 @@ int main()
     cor_fin.push_back(Point2f(800, 52));
     time_t start, end;
     file.open("dynamic.csv");
-    Dense();
+    if (argc == 1)
+        Dense("abc.mp4");
+    else
+        Dense(argv[1]);
     file.close();
 }
