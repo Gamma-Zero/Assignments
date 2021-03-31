@@ -114,8 +114,8 @@ int main(int argc, char *argv[])
 		}
 		auto end = Clock::now();
 		auto dur = std::chrono::duration_cast<std::chrono::nanoseconds > (end - start).count() / pow(10, 9);
-		cout << sqrt(error) / (framenum *1.0) << " " << dur << setprecision(5) << '\n';
-		file << sqrt(error) / (framenum *1.0) << "," << dur << setprecision(5) << '\n';
+		cout << sqrt(error / framenum *1.0) << " " << dur << setprecision(5) << '\n';
+		file << sqrt(error / framenum *1.0) << "," << dur << setprecision(5) << '\n';
 		cap2.release();
 		cv::destroyAllWindows();
 	}
