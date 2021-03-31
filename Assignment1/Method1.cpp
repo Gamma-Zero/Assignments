@@ -91,7 +91,7 @@ int main(int argc, char** argv)
 		auto start = Clock::now();
 		if (argc == 1)
 		{
-			get(x, "abc.mp4");
+			get(x, "vid.mp4");
 		}
 		else
 		{
