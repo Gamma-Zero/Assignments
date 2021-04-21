@@ -1,3 +1,0 @@
-Dense Runtime: 327.143
-Sparse Error: 0.0871846
-Sparse Runtime: 81.8202
