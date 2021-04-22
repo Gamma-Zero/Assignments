@@ -1,6 +1,6 @@
 #include<bits/stdc++.h>
 using namespace std;
-vector<vector<int>>cell(25,vector<int>(25));
+vector<vector<bool>>cell(25,vector<bool>(25,0));
 vector<pair<int, int>>edge;
 vector<int>num(700), parent(700);
 int find(int a)
@@ -28,7 +28,7 @@ void join(int a, int b)
 	int r = change / 25, c = change % 25;
 	cell[r][c] = 1;
 }
-void MazeGenerate()
+void Maze()
 {
 	for (int i = 1; i < 25; i += 2) for (int j = 1; j < 25; j += 2) cell[i][j] = 1;
 	for (int i = 1; i < 25; i += 2)
@@ -58,13 +58,10 @@ void MazeGenerate()
 		}
 		edge = edge1;
 	}
-	for (int i = 0; i < 25; ++i)
-	{
-		for (int j = 0; j < 25; ++j)
-		{
-			cout << cell[i][j] << ' ';
-		}
-		cout << '\n';
-	}
 
+}
+
+vector<vector<bool>> MazeGenerate(){
+	Maze();
+	return cell;
 }

@@ -1,15 +1,20 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <bits/stdc++.h>
+#include "CollisionDetection.h"
+#include "maze.h"
 
 using namespace std;
 
 const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 1000;
+const int SPRITE = 40;
 SDL_Window* window = NULL;
 SDL_Surface* screenSurface = NULL;
 SDL_Renderer* render=NULL;
 SDL_Texture* texture=NULL;
+SDL_Texture* wall=NULL;
+vector<vector<bool>> maze;
 
 enum KeyPressSurfaces
 {
@@ -48,6 +53,7 @@ bool init(){
 					printf("Renderer died\n");
 					success=false;
 				} else {
+				        maze=MazeGenerate();
 					SDL_SetRenderDrawColor(render,0xFF,0xFF,0xFF,0xFF);
 					screenSurface=SDL_GetWindowSurface(window);
 				}
@@ -111,31 +117,45 @@ int main(int argc, char* args[]){
 			SDL_Event e;
 			SDL_RenderClear(render);
                         texture=loadTexture(loadPNG("eg.png"));
-			int x=0,y=0;
+			wall=loadTexture(loadPNG("wall.png"));
+			int x=40,y=40;
 			while(!quit){
 				while(SDL_PollEvent(&e)!=0){
+					int store[2]={x,y};
 					if (e.type==SDL_QUIT){
 						quit=true;
 					} else if (e.type==SDL_KEYDOWN){
 						switch(e.key.keysym.sym){
 							case SDLK_UP:
-								y=max(y-40,0);
+								y=y-SPRITE;
 								break;
 							case SDLK_DOWN:
-								y=min(y+40,SCREEN_HEIGHT-40);
-                                                                break;
+								y=y+SPRITE;
+								break;
 							case SDLK_LEFT:
-								x=max(0,x-40);
-                                                                break;
+								x=x-SPRITE;
+								break;
 							case SDLK_RIGHT:
-								x=min(SCREEN_WIDTH-40,x+40);
-                                                                break;
+								x=x+SPRITE;
+								break;
 							default:
 								break;
 						}
 					}
-					SDL_Rect space={x,y,40,40};
 					SDL_RenderCopy(render,gexp,NULL,NULL);
+					if (CollisionMaze(x,y,SCREEN_WIDTH,SCREEN_HEIGHT,SPRITE,maze)){
+						x=store[0];
+						y=store[1];
+					}
+					for (int i=0;i<maze.size();i++){
+						for (int j=0;j<maze.size();j++){
+							if (!maze[i][j]){
+								SDL_Rect t={i*SPRITE,j*SPRITE,SPRITE,SPRITE};
+								SDL_RenderCopy(render,wall,NULL,&t);
+							}
+						}
+					}
+					SDL_Rect space={x,y,SPRITE,SPRITE};
                         		SDL_RenderCopy(render,texture,NULL,&space);
                         		SDL_RenderPresent(render);
 				}
