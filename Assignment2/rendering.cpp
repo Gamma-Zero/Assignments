@@ -4,8 +4,8 @@
 
 using namespace std;
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 1000;
+const int SCREEN_HEIGHT = 1000;
 SDL_Window* window = NULL;
 SDL_Surface* screenSurface = NULL;
 SDL_Renderer* render=NULL;
@@ -30,7 +30,7 @@ bool init(){
         }
         else
         {
-                window = SDL_CreateWindow( "Darkest Curse of the Dead Gods", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
+                window = SDL_CreateWindow( "Darkest Curse of the Dead Cells", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
                 if( window == NULL )
                 {
                 printf( "Window died: %s\n", SDL_GetError() );
@@ -119,22 +119,22 @@ int main(int argc, char* args[]){
 					} else if (e.type==SDL_KEYDOWN){
 						switch(e.key.keysym.sym){
 							case SDLK_UP:
-								y=max(y-5,0);
+								y=max(y-40,0);
 								break;
 							case SDLK_DOWN:
-								y=min(y+5,430);
+								y=min(y+40,SCREEN_HEIGHT-40);
                                                                 break;
 							case SDLK_LEFT:
-								x=max(0,x-5);
+								x=max(0,x-40);
                                                                 break;
 							case SDLK_RIGHT:
-								x=min(590,x+5);
+								x=min(SCREEN_WIDTH-40,x+40);
                                                                 break;
 							default:
 								break;
 						}
 					}
-					SDL_Rect space={x,y,50,50};
+					SDL_Rect space={x,y,40,40};
 					SDL_RenderCopy(render,gexp,NULL,NULL);
                         		SDL_RenderCopy(render,texture,NULL,&space);
                         		SDL_RenderPresent(render);
