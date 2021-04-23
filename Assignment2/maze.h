@@ -2,7 +2,7 @@
 using namespace std;
 vector<vector<bool>>cell(25, vector<bool>(25, 0));
 vector<pair<int, int>>edge;
-vector<int>num(700), parent(700),frcell,enemy(700);
+vector<int>num(700), parent(700),frcell;
 vector<vector<int>>dis(700, vector<int>(700,1000000));
 int find(int a)
 {
