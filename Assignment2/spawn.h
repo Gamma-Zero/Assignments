@@ -61,8 +61,10 @@ vector<pair<int,int>> randspawn(int r1, int c1, int r2, int c2)  // random spawn
 	}
 	return loc;
 }
-pair<int,int> pspawn(int r1, int c1, int r2, int c2) // periodic spawn
+pair<int,int> pspawn(int r1, int c1, int r2, int c2, vector<pair<int,int>>cur) // periodic spawn
 {
+	enemy.assign(700,0);
+	for(int i=0;i<cur.size();++i) enemy[cur[i].first*25+cur[i].second]=1;
 	vector<int>fr1;
 	vector<pair<int,int>>avail;
 	for (int i = 0; i < frcell.size(); ++i)
@@ -84,8 +86,10 @@ pair<int,int> pspawn(int r1, int c1, int r2, int c2) // periodic spawn
 	}
 	return { -1,-1 };
 }
-vector<pair<int, int>> move(int r1, int c1, int r2, int c2)  // moves all enemies
+vector<pair<int, int>> move(int r1, int c1, int r2, int c2, vector<pair<int,int>>cur)  // moves all enemies
 {
+	enemy.assign(700,0);
+	for(int i=0;i<cur.size();++i) enemy[cur[i].first*25+cur[i].second]=1;
 	vector<int>enemy1(700);
 	vector<pair<int, int>>loc;
 	for (int i = 0; i < 700; ++i)
