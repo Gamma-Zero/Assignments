@@ -3,7 +3,6 @@
 #include <bits/stdc++.h>
 #include "CollisionDetection.h"
 #include "AnimationWrappers.h"
-#include "spawn.h"
 
 using namespace std;
 
@@ -17,7 +16,7 @@ SDL_Surface* screenSurface = NULL;
 SDL_Renderer* render=NULL;
 SDL_Texture* wall=NULL;
 vector<vector<bool>> maze;
-int ssheeth,ssheetw;
+int frame=0;
 
 bool init(){
 	bool success=true;
@@ -109,10 +108,17 @@ int main(int argc, char* args[]){
 			bool quit=false;
 			SDL_Event e;
 			SDL_RenderClear(render);
+			vector<pair<int,int>> loc=randspawn(40,40,920,920);
+			Enemy en=Enemy(loadTexture(loadPNG("Textures/enemy.png")),loc,SPRITE);
 			Player p1=Player(loadTexture(loadPNG("Textures/p1.png")),40,40);
 			Player p2=Player(loadTexture(loadPNG("Textures/p2.png")),920,920);
 			wall=loadTexture(loadPNG("Textures/wall.png"));
 			while(!quit){
+				frame++;
+				if(frame==360){
+					frame=0;
+					en.AddEnemy(pspawn(p1.x,p1.y,p2.x,p2.y,en.locations));
+				}
 				int store[4]={p1.x,p1.y,p2.x,p2.y};
 				p1.passiveAnimate();
 				p2.passiveAnimate();
@@ -211,6 +217,7 @@ int main(int argc, char* args[]){
 						}
 					}
 				}
+				en.RenderEnemy(p1.x,p1.y,p2.x,p2.y,render);
 				p1.RenderPlayer(render,SDL_Rect{p1.x,p1.y,SPRITE,SPRITE});
 				p2.RenderPlayer(render,SDL_Rect{p2.x,p2.y,SPRITE,SPRITE});
                         	SDL_RenderPresent(render);
