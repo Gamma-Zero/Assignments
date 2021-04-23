@@ -66,6 +66,7 @@ struct Player{
                              walkanimation.x=0;
                              if (shootanimation.x==ssheetw){
                                          choose=0;
+					 shootanimation.x=0;
                              }
                }
 	}
