@@ -1,4 +1,5 @@
 #include<bits/stdc++.h>
+#include "maze.h"
 using namespace std;
 vector<int>enemy(700);
 vector<pair<int,int>> randspawn(int r1, int c1, int r2, int c2)  // random spawn in each quarter
