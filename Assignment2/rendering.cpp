@@ -196,7 +196,7 @@ int main(int argc, char* args[]){
 					}
                         		SDL_RenderPresent(render);
 					moving=0;
-					SDL_Delay(1000/15);
+					SDL_Delay(1000/12);
 			}
 		}
 	}
