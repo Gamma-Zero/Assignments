@@ -1,5 +1,5 @@
 #include <SDL2/SDL.h>
-#include "spawn.h"
+#include "spawncheck.h"
 
 struct Anim{
 	SDL_Rect space;
@@ -78,8 +78,9 @@ struct Enemy{
 	vector<Anim> walkanimation;
 	int ssheeth,ssheetw;
 	vector<pair<int,int>> locations;
-	int SPRITE;
-	Enemy(SDL_Texture* s,vector<pair<int,int>> loc,int S){
+	vector<int> dirs;
+	int SPRITE=40;
+	Enemy(SDL_Texture* s,vector<pair<int,int>> loc){
 		sprites=s;
 		SDL_QueryTexture(s,NULL,NULL,&ssheetw,&ssheeth);
 		for(auto i:loc){
@@ -87,7 +88,9 @@ struct Enemy{
 			walkanimation.push_back(temp);
 		}
 		locations=loc;
-		SPRITE=S;
+		for(auto i:loc){
+			dirs.push_back(-1);
+		}
 	}
 	int finddir(pair<int,int> s, pair<int,int> e){
 		if (e.first==s.first-1){
@@ -101,13 +104,14 @@ struct Enemy{
 		}
 	}
 	void RenderEnemy(int x1, int y1, int x2, int y2, SDL_Renderer* render){
-		vector<pair<int,int>> temp=move(x1,y1,x2,y2,locations);
+		vector<pair<int,int>> temp=move(x1,y1,x2,y2,locations,dirs);
 		for(int i=0;i<temp.size();++i){
 			int curr=finddir(locations[i],temp[i]);
+			dirs[i]=curr;
 			walkanimation[i].x=(walkanimation[i].x+ssheetw/13)%(9*ssheetw/13);
 			walkanimation[i].y=(curr+8)*ssheeth/21;
                         walkanimation[i].update();
-			SDL_Rect space={temp[i].first*SPRITE,temp[i].second*SPRITE,SPRITE,SPRITE};
+			SDL_Rect space={temp[i].first,temp[i].second,SPRITE,SPRITE};
 			SDL_RenderCopy(render,sprites,&walkanimation[i].space,&space);
 		}
 		locations=temp;
