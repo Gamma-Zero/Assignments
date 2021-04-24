@@ -11,3 +11,13 @@ bool CollisionMaze(int x, int y, int SCREEN_WIDTH, int SCREEN_HEIGHT, int SPRITE
 	}
 	return false;
 }
+
+bool CollisionBomb(int x, int y, int SCREEN_WIDTH, int SCREEN_HEIGHT, int SPRITE, vector<vector<bool>> mat){
+	if (x<0 || y<0 || x>(SCREEN_WIDTH-SPRITE) || y>(SCREEN_HEIGHT-SPRITE)){
+                return true;
+        }
+	if (!mat[x/SPRITE][y/SPRITE]){
+		return true;
+	}
+	return false;
+}

@@ -5,6 +5,7 @@ struct bullet
 {
     int cover=0,dir,row,col;
 };
+
 bullet spblt(int r1, int c1,int direc)   // spawn bullet
 {
     bullet b;
