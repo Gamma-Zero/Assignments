@@ -1,5 +1,5 @@
 #include <SDL2/SDL.h>
-#include "spawncheck.h"
+#include "spawnnew.h"
 
 struct Anim{
 	SDL_Rect space;
@@ -104,14 +104,14 @@ struct Enemy{
 		}
 	}
 	void RenderEnemy(int x1, int y1, int x2, int y2, SDL_Renderer* render){
-		vector<pair<int,int>> temp=move(x1,y1,x2,y2,locations,dirs);
+		vector<pair<int,int>> temp=move(y1,x1,y2,x2,locations,dirs);
 		for(int i=0;i<temp.size();++i){
 			int curr=finddir(locations[i],temp[i]);
 			dirs[i]=curr;
 			walkanimation[i].x=(walkanimation[i].x+ssheetw/13)%(9*ssheetw/13);
 			walkanimation[i].y=(curr+8)*ssheeth/21;
                         walkanimation[i].update();
-			SDL_Rect space={temp[i].first,temp[i].second,SPRITE,SPRITE};
+			SDL_Rect space={temp[i].second,temp[i].first,SPRITE,SPRITE};
 			SDL_RenderCopy(render,sprites,&walkanimation[i].space,&space);
 		}
 		locations=temp;
