@@ -2,14 +2,16 @@
 #include "maze.h"
 using namespace std;
 vector<int>enemy(700);
-vector<pair<int,int>> randspawn(int r1, int c1, int r2, int c2)  // random spawn in each quarter
+vector<pair<int, int>> randspawn(int x1, int y1, int x2, int y2)  // random spawn in each quarter
 {
-	r1 /= 40;
-	r2 /= 40;
-	c1 /= 40;
-	c2 /= 40;
+	y1 += 39;
+	y2 += 39;
+	x1 /= 40;
+	x2 /= 40;
+	y1 /= 40;
+	y2 /= 40;
 	vector<pair<int, int>>loc;
-	int p1 = 25 * r1 + c1, p2 = 25 * r2 + c2;
+	int p1 = 25 * y1 + x1, p2 = 25 * y2 + x2;
 	vector<int>tl, tr, bl, br;
 	for (int i = 0; i < 25; ++i)
 	{
@@ -28,7 +30,7 @@ vector<pair<int,int>> randspawn(int r1, int c1, int r2, int c2)  // random spawn
 		int y1 = rand() % tl.size(), z1 = tl[y1];
 		if (dis[z1][p1] > 5 && dis[z1][p2] > 5)
 		{
-			loc.push_back({ 40 * (z1 / 25), 40 * (z1 % 25)  });
+			loc.push_back({ 40 * (z1 % 25), 40 * (z1 / 25) });
 			enemy[z1] = 1;
 			break;
 		}
@@ -38,7 +40,7 @@ vector<pair<int,int>> randspawn(int r1, int c1, int r2, int c2)  // random spawn
 		int y1 = rand() % tr.size(), z1 = tr[y1];
 		if (dis[z1][p1] > 5 && dis[z1][p2] > 5)
 		{
-			loc.push_back({ 40 * (z1 / 25) , 40 * (z1 % 25) });
+			loc.push_back({ 40 * (z1 % 25) , 40 * (z1 / 25) });
 			enemy[z1] = 1;
 			break;
 		}
@@ -48,7 +50,7 @@ vector<pair<int,int>> randspawn(int r1, int c1, int r2, int c2)  // random spawn
 		int y1 = rand() % bl.size(), z1 = bl[y1];
 		if (dis[z1][p1] > 5 && dis[z1][p2] > 5)
 		{
-			loc.push_back({ 40 * (z1 / 25) , 40 * (z1 % 25) });
+			loc.push_back({ 40 * (z1 % 25) , 40 * (z1 / 25) });
 			enemy[z1] = 1;
 			break;
 		}
@@ -58,27 +60,29 @@ vector<pair<int,int>> randspawn(int r1, int c1, int r2, int c2)  // random spawn
 		int y1 = rand() % br.size(), z1 = br[y1];
 		if (dis[z1][p1] > 5 && dis[z1][p2] > 5)
 		{
-			loc.push_back({ 40 * (z1 / 25) , 40 * (z1 % 25)  });
+			loc.push_back({ 40 * (z1 % 25) , 40 * (z1 / 25) });
 			enemy[z1] = 1;
 			break;
 		}
 	}
 	return loc;
 }
-pair<int,int> pspawn(int r1, int c1, int r2, int c2, vector<pair<int,int>>cur) // periodic spawn
+pair<int, int> pspawn(int x1, int y1, int x2, int y2, vector<pair<int, int>>cur) // periodic spawn
 {
-	r1 /= 40;
-	r2 /= 40;
-	c1 /= 40;
-	c2 /= 40;
-	enemy.assign(700,0);
-	for (int i = 0; i < cur.size(); ++i) enemy[25 * (cur[i].first / 40) + (cur[i].second / 40)] = 1;
+	y1 += 39;
+	y2 += 39;
+	x1 /= 40;
+	x2 /= 40;
+	y1 /= 40;
+	y2 /= 40;
+	enemy.assign(700, 0);
+	for (int i = 0; i < cur.size(); ++i) enemy[25 * (cur[i].second / 40) + (cur[i].first / 40)] = 1;
 	vector<int>fr1;
-	vector<pair<int,int>>avail;
+	vector<pair<int, int>>avail;
 	for (int i = 0; i < frcell.size(); ++i)
 	{
-		if (dis[frcell[i]][25*r1+c1]<=5 || dis[frcell[i]][25 * r2 + c2] <= 5 || enemy[frcell[i]] == 1) continue;
-		int block = frcell[i],weight=dis[block][25*r1+c1]*dis[block][25*r2+c2];
+		if (dis[frcell[i]][25 * y1 + x1] <= 5 || dis[frcell[i]][25 * y2 + x2] <= 5 || enemy[frcell[i]] == 1) continue;
+		int block = frcell[i], weight = dis[block][25 * y1 + x1] * dis[block][25 * y2 + x2];
 		avail.push_back({ weight,block });
 	}
 	sort(avail.begin(), avail.end());
@@ -89,70 +93,68 @@ pair<int,int> pspawn(int r1, int c1, int r2, int c2, vector<pair<int,int>>cur) /
 		if (r <= avail[i].first)
 		{
 			enemy[avail[i].second] = 1;
-			return { 40 * (avail[i].second / 25) + 20, 40 * (avail[i].second % 25) + 20 };
+			return { 40 * (avail[i].second % 25) , 40 * (avail[i].second / 25)  };
 		}
 	}
 	return { -1,-1 };
 }
-vector<pair<int, int>> move(int r1, int c1, int r2, int c2, vector<pair<int,int>>cur)  // moves all enemies
+vector<pair<int, int>> move(int x1, int y1, int x2, int y2, vector<pair<int, int>>cur)  // moves all enemies
 {
-	r1 /= 40;
-	r2 /= 40;
-	c1 /= 40;
-	c2 /= 40;
+	y1 += 39;
+	y2 += 39;
+	y1 /= 40;
+	y2 /= 40;
+	x1 /= 40;
+	x2 /= 40;
 	vector<pair<int, int>>loc;
 	vector<int>nen(700);
 	for (int i = 0; i < cur.size(); ++i)
 	{
-		int curcell = 25 * (cur[i].first / 40) + (cur[i].second / 40);
+		int curcell = 25 * (cur[i].second / 40) + (cur[i].first / 40);
 		int follow;
-		if (dis[curcell][25 * r1 + c1] < dis[curcell][25 * r2 + c2]) follow = 25 * r1 + c1;
-		else if (dis[curcell][25 * r1 + c1] > dis[curcell][25 * r2 + c2]) follow = 25 * r2 + c2;
+		if (dis[curcell][25 * y1 + x1] < dis[curcell][25 * y2 + x2]) follow = 25 * y1 + x1;
+		else if (dis[curcell][25 * y1 + x1] > dis[curcell][25 * y2 + x2]) follow = 25 * y2 + x2;
 		else
 		{
 			int r = rand() % 2;
-			if (r == 0) follow = 25 * r1 + c1;
-			else  follow = 25 * r2 + c2;
+			if (r == 0) follow = 25 * y1 + x1;
+			else  follow = 25 * y2 + x2;
 		}
 		//cout<<follow<<' '<<cur[i].first<<' '<<cur[i].second<<' '<<curcell<<' '<<dis[curcell][25 * r1 + c1]<<'\n';
-		int r = curcell / 25, c = curcell % 25,nr=-1,nc=-1,d=1000000, dir=-1;
-		if (r > 0 && dis[curcell - 25][follow] < d)
+		int y = curcell / 25, x = curcell % 25, nx = -1, ny = -1, d = 1000000, dir = -1;
+		if (y > 0 && dis[curcell - 25][follow] < d)
 		{
 			d = dis[curcell - 25][follow];
-			nr = r - 1;
-			nc = c;
 			dir = 4;
 		}
-		if (r < 24 && dis[curcell + 25][follow] < d)
+		if (y < 24 && dis[curcell + 25][follow] < d)
 		{
 			d = dis[curcell + 25][follow];
-			nr = r + 1;
-			nc = c;
 			dir = 2;
 		}
-		if (c > 0 && dis[curcell - 1][follow] < d)
+		if (x > 0 && dis[curcell - 1][follow] < d)
 		{
 			d = dis[curcell - 1][follow];
-			nr = r;
-			nc = c - 1;
 			dir = 3;
 		}
-		if (c < 24 && dis[curcell + 1][follow] < d)
+		if (x < 24 && dis[curcell + 1][follow] < d)
 		{
 			d = dis[curcell + 1][follow];
-			nr = r;
-			nc = c + 1;
 			dir = 1;
 		}
-		if((nr==r1 && nc==c1) || (nr==r2 && nc==c2) || nen[25*nr+nc]==1)
+		int pixelx = cur[i].first, pixely = cur[i].second;
+		if (dir == 1) pixelx += 10; else if (dir == 2) pixely += 10; else if (dir == 3) pixelx -= 10; else pixely -= 10;
+		nx = pixelx / 40;
+		ny = pixely / 40;
+		if ((nx == x1 && ny == y1) || (nx == x2 && ny == y2) || nen[25 * ny + nx] == 1)
 			loc.push_back(cur[i]);
 		else
 		{
-			nen[25 * nr + nc] = 1;
-			if (dir == 1) loc.push_back({ cur[i].first, cur[i].second + 10 });
-			else if(dir==2) loc.push_back({ cur[i].first + 10, cur[i].second });
-			else if(dir==3) loc.push_back({ cur[i].first, cur[i].second - 10 });
-			else loc.push_back({ cur[i].first - 10, cur[i].second });
+			nen[25 * ny + nx] = 1;
+			if (dir == 1) loc.push_back({ cur[i].first + 10, cur[i].second });
+			else if (dir == 2) loc.push_back({ cur[i].first , cur[i].second + 10});
+			else if (dir == 3) loc.push_back({ cur[i].first - 10, cur[i].second });
+			else loc.push_back({ cur[i].first , cur[i].second - 10 });
 		}
 
 	}
