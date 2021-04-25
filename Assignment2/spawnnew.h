@@ -9,6 +9,8 @@ vector<pair<int, int>> randspawn(int x1, int y1, int x2, int y2)  // random spaw
 	x2 /= 40;
 	y1 /= 40;
 	y2 /= 40;
+	if (!cell[x1][y1]) ++y1;
+	if (!cell[x2][y2]) ++y2;
 	vector<pair<int, int>>loc;
 	int p1 = 25 * y1 + x1, p2 = 25 * y2 + x2;
 	vector<int>tl, tr, bl, br;
@@ -16,7 +18,7 @@ vector<pair<int, int>> randspawn(int x1, int y1, int x2, int y2)  // random spaw
 	{
 		for (int j = 0; j < 25; ++j)
 		{
-			if (!cell[i][j]) continue;
+			if (!cell[j][i]) continue;
 			if (i < 13 && j < 12) tl.push_back(25 * i + j);
 			else if (i >= 13 && j < 13) bl.push_back(25 * i + j);
 			else if (i < 12 && j >= 12) tr.push_back(25 * i + j);
@@ -68,14 +70,12 @@ vector<pair<int, int>> randspawn(int x1, int y1, int x2, int y2)  // random spaw
 }
 pair<int, int> pspawn(int x1, int y1, int x2, int y2, vector<pair<int, int>>cur) // periodic spawn
 {
-	y1 += 39;
-	y2 += 39;
-	x1 += 39;
-	x2 += 39;
 	x1 /= 40;
 	x2 /= 40;
 	y1 /= 40;
 	y2 /= 40;
+	if (!cell[x1][y1]) ++y1;
+	if (!cell[x2][y2]) ++y2;
 	enemy.assign(700, 0);
 	for (int i = 0; i < cur.size(); ++i) enemy[25 * (cur[i].second / 40) + (cur[i].first / 40)] = 1;
 	vector<int>fr1;
@@ -99,33 +99,34 @@ pair<int, int> pspawn(int x1, int y1, int x2, int y2, vector<pair<int, int>>cur)
 	}
 	return { -1,-1 };
 }
-vector<pair<int, int>> move(int x1, int y1, int x2, int y2, vector<pair<int, int>>cur, vector<int>dir)  // moves all enemies
+vector<pair<int, int>> move(int y1, int x1, int y2, int x2, vector<pair<int, int>>cur)  // moves all enemies
 {
 	vector<pair<int, int>>loc;
 	vector<int>exist(630);
 	x1 /= 40;
 	x2 /= 40;
-	y1 += 39;
-	y2 += 39;
 	y1 /= 40;
 	y2 /= 40;
+	if (!cell[x1][y1]) ++y1;
+	if (!cell[x2][y2]) ++y2;
+	cout << x1 << ' ' << y1 << '\n';
 	for (int i = 0; i < cur.size(); ++i)
 	{
 		if (cur[i].first % 40 != 0)
 		{
-			int pos1=cur[i].first/40,pos2=pos1+1,ypos=cur[i].second/40;
-			if(min(dis[pos1+25*ypos][25*y1+x1],dis[pos1+25*ypos][25*y2+x2])<min(dis[pos2+25*ypos][25*y1+x1],dis[pos2+25*ypos][25*y2+x2])) loc.push_back({cur[i].first-10,cur[i].second});
-			else loc.push_back({cur[i].first+10,cur[i].second});
+			int pos1 = cur[i].first / 40, pos2 = pos1 + 1, ypos = cur[i].second / 40;
+			if (min(dis[pos1 + 25 * ypos][25 * y1 + x1], dis[pos1 + 25 * ypos][25 * y2 + x2]) < min(dis[pos2 + 25 * ypos][25 * y1 + x1], dis[pos2 + 25 * ypos][25 * y2 + x2])) loc.push_back({ cur[i].first - 10,cur[i].second });
+			else loc.push_back({ cur[i].first + 10,cur[i].second });
 			continue;
 		}
 		if (cur[i].second % 40 != 0)
 		{
-			int pos1=cur[i].second/40,pos2=pos1+1,xpos=cur[i].first/40;
-			if(min(dis[25*pos1+xpos][25*y1+x1],dis[25*pos1+xpos][25*y2+x2])<min(dis[25*pos2+xpos][25*y1+x1],dis[25*pos2+xpos][25*y2+x2])) loc.push_back({cur[i].first,cur[i].second-10});
-			else loc.push_back({cur[i].first,cur[i].second+10});
+			int pos1 = cur[i].second / 40, pos2 = pos1 + 1, xpos = cur[i].first / 40;
+			if (min(dis[25 * pos1 + xpos][25 * y1 + x1], dis[25 * pos1 + xpos][25 * y2 + x2]) < min(dis[25 * pos2 + xpos][25 * y1 + x1], dis[25 * pos2 + xpos][25 * y2 + x2])) loc.push_back({ cur[i].first,cur[i].second - 10 });
+			else loc.push_back({ cur[i].first,cur[i].second + 10 });
 			continue;
 		}
-		int x = cur[i].first / 40, y = cur[i].second / 40, d=1000000, go=-1;
+		int x = cur[i].first / 40, y = cur[i].second / 40, d = 1000000, go = -1;
 		int block = 25 * y + x;
 		int follow;
 		if (dis[block][25 * y1 + x1] < dis[block][25 * y2 + x2]) follow = 25 * y1 + x1;
@@ -168,36 +169,13 @@ vector<pair<int, int>> move(int x1, int y1, int x2, int y2, vector<pair<int, int
 			loc.push_back(cur[i]);
 		else
 		{
-			if (go==1) loc.push_back({ cur[i].first,cur[i].second - 10 });
+			if (go == 1) loc.push_back({ cur[i].first,cur[i].second - 10 });
 			else if (go == 2) loc.push_back({ cur[i].first + 10, cur[i].second });
 			else if (go == 3) loc.push_back({ cur[i].first, cur[i].second + 10 });
 			else loc.push_back({ cur[i].first - 10, cur[i].second });
 		}
 
 	}
+	cout << loc[0].first << ' ' << loc[0].second << '\n';
 	return loc;
 }
-/*int main()
-{
-	MazeGenerate();
-	for(int i=0;i<25;++i)
-	{
-		for(int j=0;j<25;++j)
-		{
-			if(cell[i][j]) cout<<1; else cout<<0; cout<<' ';
-		}
-		cout<<'\n';
-	}
-	vector<pair<int,int>>loc=randspawn(40,40,920,920);
-	loc.pop_back();
-	loc.pop_back();
-	loc.pop_back();
-	for(int i=0;i<1000;++i)
-	{
-		loc=move(40,40,920,920,loc,{-1,-1,-1,-1});
-		for(int i=0;i<loc.size();++i)
-		{
-			cout<<loc[i].first<<' '<<loc[i].second<<'\n';
-		}
-	}
-}*/
