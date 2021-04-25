@@ -137,5 +137,6 @@ struct Enemy{
 		Anim temp=Anim(0,10*ssheeth/21,ssheetw/13,ssheeth/21);
                 walkanimation.push_back(temp);
 		locations.push_back(loc);
+		dirs.push_back(-1);
 	}
 };
