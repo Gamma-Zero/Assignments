@@ -109,7 +109,6 @@ vector<pair<int, int>> move(int y1, int x1, int y2, int x2, vector<pair<int, int
 	y2 /= 40;
 	if (!cell[x1][y1]) ++y1;
 	if (!cell[x2][y2]) ++y2;
-	cout << x1 << ' ' << y1 << '\n';
 	for (int i = 0; i < cur.size(); ++i)
 	{
 		if (cur[i].first % 40 != 0)
@@ -157,14 +156,12 @@ vector<pair<int, int>> move(int y1, int x1, int y2, int x2, vector<pair<int, int
 			d = dis[block + 25][follow];
 			go = 3;
 		}
-		//cout<<follow<<' '<<d<<' '<<go<<' '<<x<<' '<<y<<'\n';
 		int pixx = cur[i].first, pixy = cur[i].second;
 		if (go == 1) pixy -= 10;
 		else if (go == 2) pixx += 10;
 		else if (go == 3) pixy += 10;
 		else pixx -= 10;
 		int nx = pixx / 40, ny = pixy / 40;
-		//if(d==1) exit(0);
 		if (d == 0 || (nx == x1 && ny == y1) || (nx == x2 && ny == y2) || exist[25 * ny + nx])
 			loc.push_back(cur[i]);
 		else
@@ -176,6 +173,5 @@ vector<pair<int, int>> move(int y1, int x1, int y2, int x2, vector<pair<int, int
 		}
 
 	}
-	cout << loc[0].first << ' ' << loc[0].second << '\n';
 	return loc;
 }

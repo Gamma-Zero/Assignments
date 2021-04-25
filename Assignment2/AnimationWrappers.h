@@ -24,8 +24,9 @@ struct Player{
 	SDL_Texture* sprites;
 	Anim walkanimation;
 	Anim shootanimation;
+	Anim bombanimation;
 	int ssheeth,ssheetw;
-	bool choose;
+	int choose;
 	bool moving;
 	int x,y;
 	int curr;
@@ -38,6 +39,9 @@ struct Player{
                 shootanimation.y=18*ssheeth/21;
 		shootanimation.w=ssheetw/13;
 		shootanimation.h=ssheeth/21;
+		bombanimation.y=2*ssheetw/13;
+                bombanimation.w=ssheetw/13;
+                bombanimation.h=ssheeth/21;
 		x=x1;
 		y=y1;
 		choose=0;
@@ -48,27 +52,40 @@ struct Player{
 		if (!moving){
 			walkanimation.x=0;
 		}
-		if (!choose){
+		if (choose==0){
                             walkanimation.y=(curr+8)*ssheeth/21;
                             walkanimation.update();
                             SDL_RenderCopy(render,sprites,&walkanimation.space,&space);
-		} else {
+		} else if (choose==1){
                             shootanimation.y=(curr+16)*ssheeth/21;
                             shootanimation.update();
                             SDL_RenderCopy(render,sprites,&shootanimation.space,&space);
-                }
+                } else if (choose=2){
+			    bombanimation.y=(curr)*ssheeth/21;
+                            bombanimation.update();
+                            SDL_RenderCopy(render,sprites,&bombanimation.space,&space);
+		}
+
 	}
 	void passiveAnimate(){
-		if (!choose){
+		if (choose==0){
                              walkanimation.x=(walkanimation.x+ssheetw/13)%(9*ssheetw/13);
                              shootanimation.x=0;
-                } else {
+			     bombanimation.x=0;
+                } else if (choose==1){
                              shootanimation.x=shootanimation.x+ssheetw/13;
                              walkanimation.x=0;
                              if (shootanimation.x==ssheetw){
                                          choose=0;
 					 shootanimation.x=0;
                              }
+               } else if (choose==2){
+		       bombanimation.x=bombanimation.x+ssheetw/13;
+                       walkanimation.x=0;
+                       if (bombanimation.x==7*ssheetw/13){
+                                         choose=0;
+                                         bombanimation.x=0;
+                        }
                }
 	}
 };
@@ -104,14 +121,14 @@ struct Enemy{
 		}
 	}
 	void RenderEnemy(int x1, int y1, int x2, int y2, SDL_Renderer* render){
-		vector<pair<int,int>> temp=move(y1,x1,y2,x2,locations,dirs);
+		vector<pair<int,int>> temp=move(y1,x1,y2,x2,locations);
 		for(int i=0;i<temp.size();++i){
 			int curr=finddir(locations[i],temp[i]);
 			dirs[i]=curr;
 			walkanimation[i].x=(walkanimation[i].x+ssheetw/13)%(9*ssheetw/13);
 			walkanimation[i].y=(curr+8)*ssheeth/21;
                         walkanimation[i].update();
-			SDL_Rect space={temp[i].second,temp[i].first,SPRITE,SPRITE};
+			SDL_Rect space={temp[i].first,temp[i].second,SPRITE,SPRITE};
 			SDL_RenderCopy(render,sprites,&walkanimation[i].space,&space);
 		}
 		locations=temp;

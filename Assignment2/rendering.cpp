@@ -216,12 +216,12 @@ int main(int argc, char* args[]){
 					}
 				}
 				SDL_RenderCopy(render,gexp,NULL,NULL);
-				if (CollisionMaze(p1.x,p1.y,SCREEN_WIDTH,SCREEN_HEIGHT,SPRITE,maze)){
+				if (CollisionMaze(p1.x,p1.y,SCREEN_WIDTH,SCREEN_HEIGHT,SPRITE,maze,en.locations)){
 					p1.x=store[0];
 					p1.y=store[1];
 					p1.moving=0;
 				}
-				if (CollisionMaze(p2.x,p2.y,SCREEN_WIDTH,SCREEN_HEIGHT,SPRITE,maze)){
+				if (CollisionMaze(p2.x,p2.y,SCREEN_WIDTH,SCREEN_HEIGHT,SPRITE,maze,en.locations)){
                                         p2.x=store[2];
                                         p2.y=store[3];
                                         p2.moving=0;

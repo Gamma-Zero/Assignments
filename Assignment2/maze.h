@@ -118,14 +118,5 @@ vector<vector<bool>> MazeGenerate()
 		for (int j = i + 1; j < 25; ++j)
 			swap(cell[i][j], cell[j][i]);
 	}
-	for (int i = 0; i < 25; ++i)
-	{
-		for (int j = 0; j < 25; ++j)
-		{
-			if (cell[j][i]) cout << '1'; else cout << '0';
-			cout << ' ';
-		}
-		cout << '\n';
-	}
 	return cell;
 }
