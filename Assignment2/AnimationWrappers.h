@@ -30,6 +30,7 @@ struct Player{
 	bool moving;
 	int x,y;
 	int curr;
+	int HP=100;
 	Player(SDL_Texture* s, int x1, int y1){
 		sprites=s;
 		SDL_QueryTexture(s,NULL,NULL,&ssheetw,&ssheeth);
@@ -92,50 +93,36 @@ struct Player{
 
 struct Enemy{
 	SDL_Texture* sprites;
-	vector<Anim> walkanimation;
+	Anim walkanimation;
 	int ssheeth,ssheetw;
-	vector<pair<int,int>> locations;
-	vector<int> dirs;
+	pair<int,int> locations;
+	int dir;
+	int HP=20;
 	int SPRITE=40;
-	Enemy(SDL_Texture* s,vector<pair<int,int>> loc){
+	Enemy(SDL_Texture* s,pair<int,int> loc){
 		sprites=s;
 		SDL_QueryTexture(s,NULL,NULL,&ssheetw,&ssheeth);
-		for(auto i:loc){
-			Anim temp=Anim(0,10*ssheeth/21,ssheetw/13,ssheeth/21);
-			walkanimation.push_back(temp);
-		}
+		walkanimation=Anim(0,10*ssheeth/21,ssheetw/13,ssheeth/21);
 		locations=loc;
-		for(auto i:loc){
-			dirs.push_back(-1);
-		}
+		dir=-1;
 	}
-	int finddir(pair<int,int> s, pair<int,int> e){
-		if (e.first==s.first-1){
-			return 1;
-		} else if (e.first==s.first+1){
-			return 3;
-		} else if (e.second==s.second-1){
-			return 0;
-		} else {
-			return 2;
-		}
-	}
-	void RenderEnemy(int x1, int y1, int x2, int y2, SDL_Renderer* render){
-		vector<pair<int,int>> temp=move(y1,x1,y2,x2,locations);
-		for(int i=0;i<temp.size();++i){
-			int curr=finddir(locations[i],temp[i]);
-			dirs[i]=curr;
-			walkanimation[i].x=(walkanimation[i].x+ssheetw/13)%(9*ssheetw/13);
-			walkanimation[i].y=(curr+8)*ssheeth/21;
-                        walkanimation[i].update();
-			SDL_Rect space={temp[i].first,temp[i].second,SPRITE,SPRITE};
-			SDL_RenderCopy(render,sprites,&walkanimation[i].space,&space);
-		}
-		locations=temp;
-	}
-	void AddEnemy(pair<int,int> loc){
-		Anim temp=Anim(0,10*ssheeth/21,ssheetw/13,ssheeth/21);
-                walkanimation.push_back(temp);
-		locations.push_back(loc);
+	void RenderEnemy(int x1, int y1, SDL_Renderer* render){
+			walkanimation.x=(walkanimation.x+ssheetw/13)%(9*ssheetw/13);
+			walkanimation.y=(dir+8)*ssheeth/21;
+                        walkanimation.update();
+			SDL_Rect space={x1,y1,SPRITE,SPRITE};
+			SDL_RenderCopy(render,sprites,&walkanimation.space,&space);
 	}
 };
+
+int finddir(pair<int,int> s, pair<int,int> e){
+                if (e.first==s.first-1){
+                        return 1;
+                } else if (e.first==s.first+1){
+                        return 3;
+                } else if (e.second==s.second-1){
+                        return 0;
+                } else {
+                        return 2;
+                }
+        }

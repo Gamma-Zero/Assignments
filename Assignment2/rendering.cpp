@@ -16,6 +16,7 @@ SDL_Renderer* render=NULL;
 SDL_Texture* wall=NULL;
 vector<vector<bool>> maze;
 vector<Bomb> bombs;
+vector<Enemy> en;
 int frame=0;
 
 bool init(){
@@ -109,7 +110,9 @@ int main(int argc, char* args[]){
 			SDL_Event e;
 			SDL_RenderClear(render);
 			vector<pair<int,int>> loc=randspawn(40,40,920,920);
-			Enemy en=Enemy(loadTexture(loadPNG("Textures/enemy.png")),loc);
+			for (auto i:loc){
+				en.push_back(Enemy(loadTexture(loadPNG("Textures/enemy.png")),i));
+			}
 			Player p1=Player(loadTexture(loadPNG("Textures/p1.png")),40,40);
 			Player p2=Player(loadTexture(loadPNG("Textures/p2.png")),920,920);
 			SDL_Texture* bombidle=loadTexture(loadPNG("Textures/bomb.png"));
@@ -128,7 +131,7 @@ int main(int argc, char* args[]){
 				frame++;
 				if(frame==360){
 					frame=0;
-					en.AddEnemy(pspawn(p1.x,p1.y,p2.x,p2.y,en.locations));
+					en.push_back(Enemy(loadTexture(loadPNG("Textures/enemy.png")),pspawn(p1.x,p1.y,p2.x,p2.y,loc)));
 				}
 				int store[4]={p1.x,p1.y,p2.x,p2.y};
 				p1.passiveAnimate();
@@ -224,17 +227,23 @@ int main(int argc, char* args[]){
 						quit=true;
 					}
 				}
-				if (CollisionMaze(p1.x,p1.y,SCREEN_WIDTH,SCREEN_HEIGHT,SPRITE,maze,en.locations)){
+				if (CollisionMaze(p1.x,p1.y,SCREEN_WIDTH,SCREEN_HEIGHT,SPRITE,maze,loc)){
 					p1.x=store[0];
 					p1.y=store[1];
 					p1.moving=0;
 				}
-				if (CollisionMaze(p2.x,p2.y,SCREEN_WIDTH,SCREEN_HEIGHT,SPRITE,maze,en.locations)){
+				if (CollisionMaze(p2.x,p2.y,SCREEN_WIDTH,SCREEN_HEIGHT,SPRITE,maze,loc)){
                                         p2.x=store[2];
                                         p2.y=store[3];
                                         p2.moving=0;
                                 }
-				en.RenderEnemy(p1.x,p1.y,p2.x,p2.y,render);
+				vector<pair<int,int>> etemp=move(p1.y,p1.x,p2.y,p2.x,loc);
+				for (int i=0;i<etemp.size();++i){
+					int curr=finddir(loc[i],etemp[i]);
+					en[i].dir=curr;
+					en[i].RenderEnemy(etemp[i].first,etemp[i].second,render);
+				}
+				loc=etemp;
 				p1.RenderPlayer(render,SDL_Rect{p1.x,p1.y,SPRITE,SPRITE});
 				p2.RenderPlayer(render,SDL_Rect{p2.x,p2.y,SPRITE,SPRITE});
 				for (int i=0;i<bombs.size();++i){
