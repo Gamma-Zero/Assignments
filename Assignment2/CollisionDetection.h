@@ -10,7 +10,9 @@ bool CollisionMaze(int x, int y, int SCREEN_WIDTH, int SCREEN_HEIGHT, int SPRITE
 		return true;
 	}
 	for (auto i:en){
-		if ((i.first/SPRITE==x/SPRITE) && ((i.second+39)/SPRITE==(y+39)/SPRITE)){
+		if ((x<i.first+40)&&(x+40>i.first)&&
+         	(y<i.second+40)  &&
+         	(y+40>i.second)){
 			return true;
 		}
 	}
