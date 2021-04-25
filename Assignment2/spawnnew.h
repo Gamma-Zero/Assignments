@@ -162,7 +162,7 @@ vector<pair<int, int>> move(int y1, int x1, int y2, int x2, vector<pair<int, int
 		else if (go == 3) pixy += 10;
 		else pixx -= 10;
 		int nx = pixx / 40, ny = pixy / 40;
-		if (d == 0 || (nx == x1 && ny == y1) || (nx == x2 && ny == y2) || exist[25 * ny + nx])
+		if (d <= 1 || (nx == x1 && ny == y1) || (nx == x2 && ny == y2) || exist[25 * ny + nx])
 			loc.push_back(cur[i]);
 		else
 		{
