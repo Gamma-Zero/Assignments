@@ -116,6 +116,15 @@ int main(int argc, char* args[]){
 			SDL_Texture* bombexp=loadTexture(loadPNG("Textures/bombexpnew.png"));
 			wall=loadTexture(loadPNG("Textures/wall.png"));
 			while(!quit){
+				SDL_RenderCopy(render,gexp,NULL,NULL);
+                        	for (int i=0;i<maze.size();i++){
+                                        for (int j=0;j<maze.size();j++){
+                                                if (!maze[i][j]){
+                                                        SDL_Rect t={i*SPRITE,j*SPRITE,SPRITE,SPRITE};
+                                                        SDL_RenderCopy(render,wall,NULL,&t);
+                                                }
+                                        }
+                                }
 				frame++;
 				if(frame==360){
 					frame=0;
@@ -215,7 +224,6 @@ int main(int argc, char* args[]){
 						quit=true;
 					}
 				}
-				SDL_RenderCopy(render,gexp,NULL,NULL);
 				if (CollisionMaze(p1.x,p1.y,SCREEN_WIDTH,SCREEN_HEIGHT,SPRITE,maze,en.locations)){
 					p1.x=store[0];
 					p1.y=store[1];
@@ -226,14 +234,6 @@ int main(int argc, char* args[]){
                                         p2.y=store[3];
                                         p2.moving=0;
                                 }
-				for (int i=0;i<maze.size();i++){
-					for (int j=0;j<maze.size();j++){
-						if (!maze[i][j]){
-							SDL_Rect t={i*SPRITE,j*SPRITE,SPRITE,SPRITE};
-							SDL_RenderCopy(render,wall,NULL,&t);
-						}
-					}
-				}
 				en.RenderEnemy(p1.x,p1.y,p2.x,p2.y,render);
 				p1.RenderPlayer(render,SDL_Rect{p1.x,p1.y,SPRITE,SPRITE});
 				p2.RenderPlayer(render,SDL_Rect{p2.x,p2.y,SPRITE,SPRITE});
@@ -249,6 +249,7 @@ int main(int argc, char* args[]){
 				}
 				bombs=temp;
                         	SDL_RenderPresent(render);
+				SDL_RenderClear(render);
 				p1.moving=0; p2.moving=0;
 				SDL_Delay(1000/12);
 			}
