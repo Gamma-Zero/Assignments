@@ -123,7 +123,6 @@ int main(int argc, char* args[]){
 			SDL_Texture* bombexp=loadTexture(loadPNG("Textures/bombexpnew.png"));
 			wall=loadTexture(loadPNG("Textures/wall.png"));
 			while(!quit){
-				cout << schedule << '\n';
 				SDL_RenderCopy(render,gexp,NULL,NULL);
                         	for (int i=0;i<maze.size();i++){
                                         for (int j=0;j<maze.size();j++){
@@ -136,15 +135,19 @@ int main(int argc, char* args[]){
 				frame++;
 				if (schedule!=-1){
 					schedule--;
-					if (schedule==0){
+					if (schedule%10==0){
 						eid++;
-                                        	en.push_back(Enemy(eid,loadTexture(loadPNG("Textures/enemy.png")),pspawn(p1.x,p1.y,p2.x,p2.y,loc)));
+						pair<int,int> temp=pspawn(p1.x,p1.y,p2.x,p2.y,loc);
+                                        	en.push_back(Enemy(eid,loadTexture(loadPNG("Textures/enemy.png")),temp));
+						loc.push_back(temp);
 					}
 				}
 				if(frame==360){
 					frame=0;
 					eid++;
-					en.push_back(Enemy(eid,loadTexture(loadPNG("Textures/enemy.png")),pspawn(p1.x,p1.y,p2.x,p2.y,loc)));
+					pair<int,int> temp=pspawn(p1.x,p1.y,p2.x,p2.y,loc);
+					en.push_back(Enemy(eid,loadTexture(loadPNG("Textures/enemy.png")),temp));
+					loc.push_back(temp);
 				}
 				int store[4]={p1.x,p1.y,p2.x,p2.y};
 				p1.passiveAnimate();
@@ -276,8 +279,8 @@ int main(int argc, char* args[]){
 						tloc.push_back(etemp[i]);
 					}
 				}
-				if (ehit.size()!=0){
-					schedule=10;
+				if (ehit.size()){
+					schedule=ehit.size()*10;
 				}
 				en=ten;
 				loc=tloc;
