@@ -89,22 +89,27 @@ struct Player{
                         }
                }
 	}
+	void upHP(int val){
+		HP=val;
+	}
 };
 
 struct Enemy{
 	SDL_Texture* sprites;
+	int id;
 	Anim walkanimation;
 	int ssheeth,ssheetw;
 	pair<int,int> locations;
 	int dir;
 	int HP=20;
 	int SPRITE=40;
-	Enemy(SDL_Texture* s,pair<int,int> loc){
+	Enemy(int i, SDL_Texture* s,pair<int,int> loc){
 		sprites=s;
 		SDL_QueryTexture(s,NULL,NULL,&ssheetw,&ssheeth);
 		walkanimation=Anim(0,10*ssheeth/21,ssheetw/13,ssheeth/21);
 		locations=loc;
 		dir=-1;
+		id=i;
 	}
 	void RenderEnemy(int x1, int y1, SDL_Renderer* render){
 			walkanimation.x=(walkanimation.x+ssheetw/13)%(9*ssheetw/13);
@@ -112,6 +117,9 @@ struct Enemy{
                         walkanimation.update();
 			SDL_Rect space={x1,y1,SPRITE,SPRITE};
 			SDL_RenderCopy(render,sprites,&walkanimation.space,&space);
+	}
+	void upHP(int val){
+		HP=val;
 	}
 };
 

@@ -17,7 +17,10 @@ SDL_Texture* wall=NULL;
 vector<vector<bool>> maze;
 vector<Bomb> bombs;
 vector<Enemy> en;
+vector<int> ehit;
 int frame=0;
+int eid=0;
+int schedule=-1;
 
 bool init(){
 	bool success=true;
@@ -111,7 +114,8 @@ int main(int argc, char* args[]){
 			SDL_RenderClear(render);
 			vector<pair<int,int>> loc=randspawn(40,40,920,920);
 			for (auto i:loc){
-				en.push_back(Enemy(loadTexture(loadPNG("Textures/enemy.png")),i));
+				eid++;
+				en.push_back(Enemy(eid,loadTexture(loadPNG("Textures/enemy.png")),i));
 			}
 			Player p1=Player(loadTexture(loadPNG("Textures/p1.png")),40,40);
 			Player p2=Player(loadTexture(loadPNG("Textures/p2.png")),920,920);
@@ -119,6 +123,7 @@ int main(int argc, char* args[]){
 			SDL_Texture* bombexp=loadTexture(loadPNG("Textures/bombexpnew.png"));
 			wall=loadTexture(loadPNG("Textures/wall.png"));
 			while(!quit){
+				cout << schedule << '\n';
 				SDL_RenderCopy(render,gexp,NULL,NULL);
                         	for (int i=0;i<maze.size();i++){
                                         for (int j=0;j<maze.size();j++){
@@ -129,9 +134,17 @@ int main(int argc, char* args[]){
                                         }
                                 }
 				frame++;
+				if (schedule!=-1){
+					schedule--;
+					if (schedule==0){
+						eid++;
+                                        	en.push_back(Enemy(eid,loadTexture(loadPNG("Textures/enemy.png")),pspawn(p1.x,p1.y,p2.x,p2.y,loc)));
+					}
+				}
 				if(frame==360){
 					frame=0;
-					en.push_back(Enemy(loadTexture(loadPNG("Textures/enemy.png")),pspawn(p1.x,p1.y,p2.x,p2.y,loc)));
+					eid++;
+					en.push_back(Enemy(eid,loadTexture(loadPNG("Textures/enemy.png")),pspawn(p1.x,p1.y,p2.x,p2.y,loc)));
 				}
 				int store[4]={p1.x,p1.y,p2.x,p2.y};
 				p1.passiveAnimate();
@@ -141,6 +154,7 @@ int main(int argc, char* args[]){
 				if (keystate[SDL_SCANCODE_UP]){
 					if (p1.choose==0){
 						if (p1.curr==0){
+						
 							p1.y=p1.y-SPRITE/2; p1.moving=1;
                                                 } else {
                                                         p1.curr=0;
@@ -238,25 +252,47 @@ int main(int argc, char* args[]){
                                         p2.moving=0;
                                 }
 				vector<pair<int,int>> etemp=move(p1.y,p1.x,p2.y,p2.x,loc);
-				for (int i=0;i<etemp.size();++i){
-					int curr=finddir(loc[i],etemp[i]);
-					en[i].dir=curr;
-					en[i].RenderEnemy(etemp[i].first,etemp[i].second,render);
-				}
-				loc=etemp;
-				p1.RenderPlayer(render,SDL_Rect{p1.x,p1.y,SPRITE,SPRITE});
-				p2.RenderPlayer(render,SDL_Rect{p2.x,p2.y,SPRITE,SPRITE});
 				for (int i=0;i<bombs.size();++i){
-					bombs[i].Tick();
-					bombs[i].RenderBomb(render);
-				}
-				vector<Bomb> temp;
-				for(auto i:bombs){
-					if (i.spawntimer!=0){
-						temp.push_back(i);
+                                        bombs[i].Tick();
+                                        bombs[i].RenderBomb(render);
+					ehit=bombs[i].check(&p1,&p2,en);
+                                }
+                                vector<Bomb> temp;
+                                for(auto i:bombs){
+                                        if (i.spawntimer!=0){
+                                                temp.push_back(i);
+                                        }
+                                }
+                                bombs=temp;
+				vector<pair<int,int>> tloc;
+				vector<Enemy> ten;
+				for (int i=0;i<etemp.size();++i){
+					if (find(ehit.begin(),ehit.end(),en[i].id)==ehit.end()){
+						int curr=finddir(loc[i],etemp[i]);
+						en[i].dir=curr;
+						en[i].locations=etemp[i];
+						en[i].RenderEnemy(etemp[i].first,etemp[i].second,render);
+						ten.push_back(en[i]);
+						tloc.push_back(etemp[i]);
 					}
 				}
-				bombs=temp;
+				if (ehit.size()!=0){
+					schedule=10;
+				}
+				en=ten;
+				loc=tloc;
+				if (p1.HP<=0 && p2.HP<=0){
+					cout << "Mutual Destruction\n";
+					quit=true;
+				} else if (p1.HP<=0){
+					cout << "Player 2 won\n";
+					quit=true;
+				} else if (p2.HP<=0){
+					cout << "Player 1 won\n";
+					quit=true;
+				}
+				p1.RenderPlayer(render,SDL_Rect{p1.x,p1.y,SPRITE,SPRITE});
+				p2.RenderPlayer(render,SDL_Rect{p2.x,p2.y,SPRITE,SPRITE});
                         	SDL_RenderPresent(render);
 				SDL_RenderClear(render);
 				p1.moving=0; p2.moving=0;
