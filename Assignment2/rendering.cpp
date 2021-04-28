@@ -1,26 +1,12 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <bits/stdc++.h>
 #include "projectiles.h"
+#include "Global.h"
+#include "font.h"
 
 using namespace std;
-
-const int SCREEN_WIDTH = 1000;
-const int SCREEN_HEIGHT = 1000;
-const int SPRITE = 40;
-const int FPS = 60;
-
-SDL_Window* window = NULL;
-SDL_Surface* screenSurface = NULL;
-SDL_Renderer* render=NULL;
-SDL_Texture* wall=NULL;
-vector<vector<bool>> maze;
-vector<Bomb> bombs;
-vector<Enemy> en;
-vector<int> ehit;
-int frame=0;
-int eid=0;
-int schedule=-1;
 
 bool init(){
 	bool success=true;
@@ -31,6 +17,7 @@ bool init(){
         }
         else
         {
+		TTF_Init();
                 window = SDL_CreateWindow( "Darkest Curse of the Dead Cells", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
                 if( window == NULL )
                 {
@@ -52,6 +39,7 @@ bool init(){
 				        maze=MazeGenerate();
 					SDL_SetRenderDrawColor(render,0xFF,0xFF,0xFF,0xFF);
 					screenSurface=SDL_GetWindowSurface(window);
+					font=TTF_OpenFont("Fonts/Raleway-Black.ttf",20);
 				}
 			}
                 }
@@ -82,22 +70,13 @@ SDL_Surface* loadPNG(string path){
 	return opt;
 }
 
-SDL_Texture* loadTexture(SDL_Surface* input){
-	Uint32 colorkey=SDL_MapRGB(input->format,0,0,0);
-	SDL_SetColorKey(input,SDL_TRUE,colorkey);
-	SDL_Texture* temp=SDL_CreateTextureFromSurface(render,input);
-	if (temp==NULL){
-		printf("Texture Conversion died\n");
-	}
-	return temp;
-}
-
 void close(){
 	SDL_DestroyWindow(window);
 	window=NULL;
 	SDL_DestroyRenderer(render);
 	render=NULL;
 	IMG_Quit();
+	TTF_Quit();
 	SDL_Quit();
 }
 
@@ -296,6 +275,11 @@ int main(int argc, char* args[]){
 				}
 				p1.RenderPlayer(render,SDL_Rect{p1.x,p1.y,SPRITE,SPRITE});
 				p2.RenderPlayer(render,SDL_Rect{p2.x,p2.y,SPRITE,SPRITE});
+				RenderFont(render,font,p1.x,p1.y-10,p1.HP);
+				RenderFont(render,font,p2.x,p2.y-10,p2.HP);
+				for (auto i:en){
+					RenderFont(render,font,i.locations.first,i.locations.second-10,i.HP);
+				}
                         	SDL_RenderPresent(render);
 				SDL_RenderClear(render);
 				p1.moving=0; p2.moving=0;
