@@ -1,7 +1,6 @@
 #include<bits/stdc++.h>
 #include "maze.h"
 using namespace std;
-vector<int>enemy(700);
 
 vector<pair<int, int>> randspawn(int x1, int y1, int x2, int y2)  // random spawn in each quarter
 {
@@ -13,56 +12,53 @@ vector<pair<int, int>> randspawn(int x1, int y1, int x2, int y2)  // random spaw
 	if (!cell[x2][y2]) ++y2;
 	vector<pair<int, int>>loc;
 	int p1 = 25 * y1 + x1, p2 = 25 * y2 + x2;
-	vector<int>tl, tr, bl, br;
+	vector<int>a1,a2;
 	for (int i = 0; i < 25; ++i)
 	{
 		for (int j = 0; j < 25; ++j)
 		{
-			if (!cell[j][i]) continue;
-			if (i < 13 && j < 12) tl.push_back(25 * i + j);
-			else if (i >= 13 && j < 13) bl.push_back(25 * i + j);
-			else if (i < 12 && j >= 12) tr.push_back(25 * i + j);
-			else br.push_back(25 * i + j);
+			if (!cell[j][i] ) continue;
+			if (dis[25 * i + j][25 * y1 + x1] >= 15 && dis[25 * i + j][25 * y2 + x2]> dis[25 * i + j][25 * y1 + x1]+5) a1.push_back(25 * i + j);
+			if (dis[25 * i + j][25 * y2 + x2] >= 15 && dis[25 * i + j][25 * y1 + x1] > dis[25 * i + j][25 * y2 + x2] + 5) a2.push_back(25 * i + j);
 		}
 	}
+	int cur1 = -1, cur2 = -1;
 	srand(time(0));
 	while (true)
 	{
-		int y1 = rand() % tl.size(), z1 = tl[y1];
-		if (dis[z1][p1] > 5 && dis[z1][p2] > 5)
+		int y1 = rand() % a1.size(), z1 = a1[y1];
+		if (z1!=cur1)
 		{
 			loc.push_back({ 40 * (z1 % 25), 40 * (z1 / 25) });
-			enemy[z1] = 1;
+			cur1 = z1;
 			break;
 		}
 	}
 	while (true)
 	{
-		int y1 = rand() % tr.size(), z1 = tr[y1];
-		if (dis[z1][p1] > 5 && dis[z1][p2] > 5)
+		int y1 = rand() % a1.size(), z1 = a1[y1];
+		if (z1!=cur1)
 		{
 			loc.push_back({ 40 * (z1 % 25) , 40 * (z1 / 25) });
-			enemy[z1] = 1;
 			break;
 		}
 	}
 	while (true)
 	{
-		int y1 = rand() % bl.size(), z1 = bl[y1];
-		if (dis[z1][p1] > 5 && dis[z1][p2] > 5)
+		int y1 = rand() % a2.size(), z1 = a2[y1];
+		if (z1 != cur2)
 		{
-			loc.push_back({ 40 * (z1 % 25) , 40 * (z1 / 25) });
-			enemy[z1] = 1;
+			loc.push_back({ 40 * (z1 % 25), 40 * (z1 / 25) });
+			cur2 = z1;
 			break;
 		}
 	}
 	while (true)
 	{
-		int y1 = rand() % br.size(), z1 = br[y1];
-		if (dis[z1][p1] > 5 && dis[z1][p2] > 5)
+		int y1 = rand() % a2.size(), z1 = a2[y1];
+		if (z1 != cur1)
 		{
 			loc.push_back({ 40 * (z1 % 25) , 40 * (z1 / 25) });
-			enemy[z1] = 1;
 			break;
 		}
 	}
@@ -76,7 +72,7 @@ pair<int, int> pspawn(int x1, int y1, int x2, int y2, vector<pair<int, int>>cur)
 	y2 /= 40;
 	if (!cell[x1][y1]) ++y1;
 	if (!cell[x2][y2]) ++y2;
-	enemy.assign(700, 0);
+	vector<int>enemy(700);
 	for (int i = 0; i < cur.size(); ++i) enemy[25 * (cur[i].second / 40) + (cur[i].first / 40)] = 1;
 	vector<int>fr1;
 	vector<pair<int, int>>avail;
@@ -162,7 +158,7 @@ vector<pair<int, int>> move(int y1, int x1, int y2, int x2, vector<pair<int, int
 		else if (go == 3) pixy += 10;
 		else pixx -= 10;
 		int nx = pixx / 40, ny = pixy / 40;
-		if (d == 0 || (nx == x1 && ny == y1) || (nx == x2 && ny == y2) || exist[25 * ny + nx])
+		if (d ==0 || (nx == x1 && ny == y1) || (nx == x2 && ny == y2) || exist[25 * ny + nx])
 			loc.push_back(cur[i]);
 		else
 		{
