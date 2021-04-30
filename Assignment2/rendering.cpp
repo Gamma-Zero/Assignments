@@ -1,6 +1,6 @@
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <bits/stdc++.h>
 #include "projectiles.h"
 #include "Global.h"
@@ -101,8 +101,8 @@ int main(int argc, char* args[]) {
 				eid++;
 				en.push_back(Enemy(eid, loadTexture(loadPNG("Textures/enemy.png")), i));
 			}
-			Player p1 = Player(loadTexture(loadPNG("Textures/p1.png")), 200, 200);
-			Player p2 = Player(loadTexture(loadPNG("Textures/p2.png")), 680, 680);
+			Player p1 = Player(loadTexture(loadPNG("Textures/p1.png")), 40, 40);
+			Player p2 = Player(loadTexture(loadPNG("Textures/p2.png")), 920, 920);
 			SDL_Texture* bombidle = loadTexture(loadPNG("Textures/bomb.png"));
 			SDL_Texture* bombexp = loadTexture(loadPNG("Textures/bombexpnew.png"));
 			wall = loadTexture(loadPNG("Textures/wall.png"));
@@ -327,7 +327,7 @@ int main(int argc, char* args[]) {
 					}
 				}
 				if (ehit.size()) {
-					schedule = ehit.size() * 10;
+					schedule += ehit.size() * 10;
 				}
 				en = ten;
 				loc = tloc;
@@ -354,6 +354,7 @@ int main(int argc, char* args[]) {
 				SDL_RenderClear(render);
 				p1.moving = 0; p2.moving = 0;
 				SDL_Delay(1000 / 12);
+				ehit.clear();
 			}
 		}
 	}
