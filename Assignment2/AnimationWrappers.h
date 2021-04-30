@@ -27,6 +27,7 @@ struct Player {
 	Anim bombanimation;
 	int ssheeth, ssheetw;
 	int choose;
+	int rest=0;
 	bool moving;
 	int x, y;
 	int curr;
