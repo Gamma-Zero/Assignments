@@ -138,6 +138,32 @@ int main(int argc, char* args[]) {
 				p2.passiveAnimate();
 				SDL_PumpEvents();
 				const Uint8* keystate = SDL_GetKeyboardState(NULL);
+				bool danger1 = false, danger2 = false;
+				int g1 = p1.x / 40, g2 = p2.x / 40, h1 = (p1.y + 39) / 40, h2 = (p2.y + 39) / 40;
+				for (auto i : en)
+				{
+					int k1 = i.locations.first / 40, k2 =( i.locations.second + 39)/ 40;
+					if (abs(k1-g1)+abs(k2-h1)==1) danger1 = true;
+					if (abs(k1-g2)+abs(k2-h2)==1) danger2 = true;
+				}
+				if (danger1)
+				{
+					if (p1.rest == 0)
+					{
+						p1.HP -= 10;
+						p1.rest = 21;
+					}
+				}
+				if (danger2)
+				{
+					if (p2.rest == 0)
+					{
+						p2.HP -= 10;
+						p2.rest = 21;
+					}
+				}
+				if (p1.rest > 0) --p1.rest;
+				if (p2.rest > 0) --p2.rest;
 				if (keystate[SDL_SCANCODE_UP]) {
 					if (p1.choose == 0) {
 						if (p1.curr == 0) {
