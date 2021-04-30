@@ -6,10 +6,12 @@ vector<pair<int, int>> randspawn(int x1, int y1, int x2, int y2)  // random spaw
 {
 	x1 /= 40;
 	x2 /= 40;
+	y1 += 39;
+	y2 += 39;
 	y1 /= 40;
 	y2 /= 40;
-	if (!cell[x1][y1]) ++y1;
-	if (!cell[x2][y2]) ++y2;
+	assert(cell[x1][y1]);
+	assert(cell[x2][y2]);
 	vector<pair<int, int>>loc;
 	int p1 = 25 * y1 + x1, p2 = 25 * y2 + x2;
 	vector<int>a1,a2;
@@ -18,7 +20,7 @@ vector<pair<int, int>> randspawn(int x1, int y1, int x2, int y2)  // random spaw
 		for (int j = 0; j < 25; ++j)
 		{
 			if (!cell[j][i] ) continue;
-			if (dis[25 * i + j][25 * y1 + x1] >= 15 && dis[25 * i + j][25 * y2 + x2]> dis[25 * i + j][25 * y1 + x1]+5) a1.push_back(25 * i + j);
+			if (dis[25 * i + j][25 * y1 + x1] >= 15 && dis[25 * i + j][25 * y2 + x2]> dis[25 * i + j][25 * y1 + x1] + 5) a1.push_back(25 * i + j);
 			if (dis[25 * i + j][25 * y2 + x2] >= 15 && dis[25 * i + j][25 * y1 + x1] > dis[25 * i + j][25 * y2 + x2] + 5) a2.push_back(25 * i + j);
 		}
 	}
@@ -68,10 +70,12 @@ pair<int, int> pspawn(int x1, int y1, int x2, int y2, vector<pair<int, int>>cur)
 {
 	x1 /= 40;
 	x2 /= 40;
+	y1 += 39;
+	y2 += 39;
 	y1 /= 40;
 	y2 /= 40;
-	if (!cell[x1][y1]) ++y1;
-	if (!cell[x2][y2]) ++y2;
+	assert(cell[x1][y1]);
+	assert(cell[x2][y2]);
 	vector<int>enemy(700);
 	for (int i = 0; i < cur.size(); ++i) enemy[25 * (cur[i].second / 40) + (cur[i].first / 40)] = 1;
 	vector<int>fr1;
@@ -101,10 +105,12 @@ vector<pair<int, int>> move(int y1, int x1, int y2, int x2, vector<pair<int, int
 	vector<int>exist(630);
 	x1 /= 40;
 	x2 /= 40;
+	y1 += 39;
+	y2 += 39;
 	y1 /= 40;
 	y2 /= 40;
-	if (!cell[x1][y1]) ++y1;
-	if (!cell[x2][y2]) ++y2;
+	assert(cell[x1][y1]);
+	assert(cell[x2][y2]);
 	for (int i = 0; i < cur.size(); ++i)
 	{
 		if (cur[i].first % 40 != 0)
