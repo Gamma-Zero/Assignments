@@ -107,6 +107,7 @@ int main(int argc, char* args[]) {
 			SDL_Texture* bombexp = loadTexture(loadPNG("Textures/bombexpnew.png"));
 			arrow = loadTexture(loadPNG("Textures/arrow-scaled.png"));
 			wall = loadTexture(loadPNG("Textures/wall.png"));
+			int timer1=-1; int timer2=-1;
 			while (!quit) {
 				SDL_RenderCopy(render, gexp, NULL, NULL);
 				for (int i = 0; i < maze.size(); i++) {
@@ -211,7 +212,7 @@ int main(int argc, char* args[]) {
 				}
 				else if (keystate[SDL_SCANCODE_SPACE]) {
 					if (p1.choose == 0) {
-						bul.push_back(bullet(arrow, p1.curr, p1.x, p1.y, 2));
+						timer1=5;
 						p1.choose = 1;
 					}
 				}
@@ -267,7 +268,7 @@ int main(int argc, char* args[]) {
 				}
 				else if (keystate[SDL_SCANCODE_Q]) {
 					if (p2.choose == 0) {
-						bul.push_back(bullet(arrow, p2.curr, p2.x, p2.y, 2));
+						timer2=5;
 						p2.choose = 1;
 					}
 				}
@@ -282,6 +283,18 @@ int main(int argc, char* args[]) {
 						quit = true;
 					}
 				}
+				if (timer1>0){
+                                                timer1--;
+                                        } else if (timer1==0){
+                                                bul.push_back(bullet(arrow, p1.curr, p1.x, p1.y, 1));
+                                                timer1--;
+                                        }
+				if (timer2>0){
+                                                timer2--;
+                                        } else if (timer2==0){
+                                                bul.push_back(bullet(arrow, p2.curr, p2.x, p2.y, 2));
+                                                timer2--;
+                                        }
 				if (CollisionMaze(p1.x, p1.y, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE, maze, loc)) {
 					p1.x = store[0];
 					p1.y = store[1];
