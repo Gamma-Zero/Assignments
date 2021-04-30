@@ -10,6 +10,7 @@ SDL_Texture* wall=NULL;
 TTF_Font *font=NULL;
 vector<vector<bool>> maze;
 vector<Bomb> bombs;
+vector<bullet>bul;
 vector<Enemy> en;
 vector<int> ehit;
 int frame=0;
