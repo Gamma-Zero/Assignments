@@ -18,7 +18,7 @@ bool init() {
 	else
 	{
 		TTF_Init();
-		window = SDL_CreateWindow("Darkest Curse of the Dead Cells", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+		window = SDL_CreateWindow("Darkest Curse of the Dead Cells", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE);
 		if (window == NULL)
 		{
 			printf("Window died: %s\n", SDL_GetError());
@@ -105,6 +105,7 @@ int main(int argc, char* args[]) {
 			Player p2 = Player(loadTexture(loadPNG("Textures/p2.png")), 920, 920);
 			SDL_Texture* bombidle = loadTexture(loadPNG("Textures/bomb.png"));
 			SDL_Texture* bombexp = loadTexture(loadPNG("Textures/bombexpnew.png"));
+			arrow = loadTexture(loadPNG("Textures/arrow-scaled.png"));
 			wall = loadTexture(loadPNG("Textures/wall.png"));
 			while (!quit) {
 				SDL_RenderCopy(render, gexp, NULL, NULL);
@@ -210,7 +211,7 @@ int main(int argc, char* args[]) {
 				}
 				else if (keystate[SDL_SCANCODE_SPACE]) {
 					if (p1.choose == 0) {
-						bul.push_back(bullet(p1.curr, p1.x, p1.y, 2));
+						bul.push_back(bullet(arrow, p1.curr, p1.x, p1.y, 2));
 						p1.choose = 1;
 					}
 				}
@@ -266,7 +267,7 @@ int main(int argc, char* args[]) {
 				}
 				else if (keystate[SDL_SCANCODE_Q]) {
 					if (p2.choose == 0) {
-						bul.push_back(bullet(p2.curr, p2.x, p2.y, 2));
+						bul.push_back(bullet(arrow, p2.curr, p2.x, p2.y, 2));
 						p2.choose = 1;
 					}
 				}
@@ -299,6 +300,9 @@ int main(int argc, char* args[]) {
 					for (auto j : ehitt)
 						ehit.push_back(j);
 				}
+				for (int i=0;i<etemp.size();++i){
+					en[i].locations=etemp[i];
+				}
 				vector<Bomb> temp;
 				for (auto i : bombs) {
 					if (i.spawntimer != 0) {
@@ -314,6 +318,9 @@ int main(int argc, char* args[]) {
 					if (bul[i].status == 1) bul1.push_back(bul[i]);
 				}
 				bul = bul1;
+				for (auto i:bul){
+					i.RenderBullet(render);
+				}
 				vector<pair<int, int>> tloc;
 				vector<Enemy> ten;
 				for (int i = 0; i < etemp.size(); ++i) {

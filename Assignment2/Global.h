@@ -7,6 +7,7 @@ SDL_Window* window = NULL;
 SDL_Surface* screenSurface = NULL;
 SDL_Renderer* render=NULL;
 SDL_Texture* wall=NULL;
+SDL_Texture* arrow=NULL;
 TTF_Font *font=NULL;
 vector<vector<bool>> maze;
 vector<Bomb> bombs;

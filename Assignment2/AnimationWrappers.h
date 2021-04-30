@@ -1,4 +1,4 @@
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include "spawnnew.h"
 
 struct Anim {
@@ -145,9 +145,13 @@ int finddir(pair<int, int> s, pair<int, int> e) {
 
 struct bullet
 {
+	SDL_Texture* sprite;
 	int movedir, dis, id, status, curx, cury;
-	bullet(int direction, int x, int y, int pl_id)
+	int sh,sw;
+	bullet(SDL_Texture* s, int direction, int x, int y, int pl_id)
 	{
+		sprite=s;
+		SDL_QueryTexture(s, NULL, NULL, &sw, &sh);
 		movedir = direction;
 		x /= 40;
 		y += 39;
@@ -207,5 +211,10 @@ struct bullet
 			}
 		}
 		return -1;
+	}
+	void RenderBullet(SDL_Renderer* render){
+		SDL_Rect space={curx*40,cury*40,40,40};
+		SDL_Rect renderspace={movedir*sw/4,0,sw/4,sh};
+		SDL_RenderCopy(render,sprite,&renderspace,&space);
 	}
 };
