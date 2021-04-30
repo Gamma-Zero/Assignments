@@ -1,6 +1,6 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
 #include <bits/stdc++.h>
 #include "projectiles.h"
 #include "Global.h"
@@ -8,61 +8,64 @@
 
 using namespace std;
 
-bool init(){
-	bool success=true;
-	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
-        {
-                printf( "SDL died: %s\n", SDL_GetError() );
-		success=false;
-        }
-        else
-        {
+bool init() {
+	bool success = true;
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	{
+		printf("SDL died: %s\n", SDL_GetError());
+		success = false;
+	}
+	else
+	{
 		TTF_Init();
-                window = SDL_CreateWindow( "Darkest Curse of the Dead Cells", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
-                if( window == NULL )
-                {
-                printf( "Window died: %s\n", SDL_GetError() );
-		success=false;
-                }
-                else
-                {
+		window = SDL_CreateWindow("Darkest Curse of the Dead Cells", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+		if (window == NULL)
+		{
+			printf("Window died: %s\n", SDL_GetError());
+			success = false;
+		}
+		else
+		{
 			int imgFlags = IMG_INIT_PNG;
-			if (!(IMG_Init(imgFlags) & imgFlags)){
+			if (!(IMG_Init(imgFlags) & imgFlags)) {
 				printf("SDL_Image died\n");
-				success=false;
-			} else {
-				render=SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-				if (render==NULL){
+				success = false;
+			}
+			else {
+				render = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+				if (render == NULL) {
 					printf("Renderer died\n");
-					success=false;
-				} else {
-				        maze=MazeGenerate();
-					SDL_SetRenderDrawColor(render,0xFF,0xFF,0xFF,0xFF);
-					screenSurface=SDL_GetWindowSurface(window);
-					font=TTF_OpenFont("Fonts/Raleway-Black.ttf",20);
+					success = false;
+				}
+				else {
+					maze = MazeGenerate();
+					SDL_SetRenderDrawColor(render, 0xFF, 0xFF, 0xFF, 0xFF);
+					screenSurface = SDL_GetWindowSurface(window);
+					font = TTF_OpenFont("Fonts/Raleway-Black.ttf", 20);
 				}
 			}
-                }
-        }
+		}
+	}
 	return success;
 }
 
-SDL_Surface* loadBMP(string path){
+SDL_Surface* loadBMP(string path) {
 	SDL_Surface* temp = SDL_LoadBMP(path.c_str());
-	if (temp==NULL){
+	if (temp == NULL) {
 		printf("Load failed\n");
 	}
 	return temp;
 }
 
-SDL_Surface* loadPNG(string path){
-	SDL_Surface* opt=NULL;
-	SDL_Surface* temp=IMG_Load(path.c_str());
-	if (temp==NULL){
+SDL_Surface* loadPNG(string path) {
+	SDL_Surface* opt = NULL;
+	SDL_Surface* temp = IMG_Load(path.c_str());
+	if (temp == NULL) {
 		printf("PNG Load failed\n");
-	} else {
-		opt=SDL_ConvertSurface(temp,screenSurface->format,0);
-		if (opt==NULL){
+	}
+	else {
+		opt = SDL_ConvertSurface(temp, screenSurface->format, 0);
+		if (opt == NULL) {
 			printf("Could not optimize\n");
 		}
 		SDL_FreeSurface(temp);
@@ -70,220 +73,254 @@ SDL_Surface* loadPNG(string path){
 	return opt;
 }
 
-void close(){
+void close() {
 	SDL_DestroyWindow(window);
-	window=NULL;
+	window = NULL;
 	SDL_DestroyRenderer(render);
-	render=NULL;
+	render = NULL;
 	IMG_Quit();
 	TTF_Quit();
 	SDL_Quit();
 }
 
-int main(int argc, char* args[]){
-	if (!init()){
+int main(int argc, char* args[]) {
+	if (!init()) {
 		printf("Failed\n");
-	} else {
-		SDL_Texture* gexp=loadTexture(loadPNG("Textures/grass.png"));
-		if (gexp==NULL){
+	}
+	else {
+		SDL_Texture* gexp = loadTexture(loadPNG("Textures/grass.png"));
+		if (gexp == NULL) {
 			printf("Failed\n");
-		} else {
-			bool quit=false;
+		}
+		else {
+			bool quit = false;
 			SDL_Event e;
 			SDL_RenderClear(render);
-			vector<pair<int,int>> loc=randspawn(40,40,920,920);
-			for (auto i:loc){
+			vector<pair<int, int>> loc = randspawn(40, 40, 920, 920);
+			for (auto i : loc) {
 				eid++;
-				en.push_back(Enemy(eid,loadTexture(loadPNG("Textures/enemy.png")),i));
+				en.push_back(Enemy(eid, loadTexture(loadPNG("Textures/enemy.png")), i));
 			}
-			Player p1=Player(loadTexture(loadPNG("Textures/p1.png")),40,40);
-			Player p2=Player(loadTexture(loadPNG("Textures/p2.png")),920,920);
-			SDL_Texture* bombidle=loadTexture(loadPNG("Textures/bomb.png"));
-			SDL_Texture* bombexp=loadTexture(loadPNG("Textures/bombexpnew.png"));
-			wall=loadTexture(loadPNG("Textures/wall.png"));
-			while(!quit){
-				SDL_RenderCopy(render,gexp,NULL,NULL);
-                        	for (int i=0;i<maze.size();i++){
-                                        for (int j=0;j<maze.size();j++){
-                                                if (!maze[i][j]){
-                                                        SDL_Rect t={i*SPRITE,j*SPRITE,SPRITE,SPRITE};
-                                                        SDL_RenderCopy(render,wall,NULL,&t);
-                                                }
-                                        }
-                                }
+			Player p1 = Player(loadTexture(loadPNG("Textures/p1.png")), 200, 200);
+			Player p2 = Player(loadTexture(loadPNG("Textures/p2.png")), 680, 680);
+			SDL_Texture* bombidle = loadTexture(loadPNG("Textures/bomb.png"));
+			SDL_Texture* bombexp = loadTexture(loadPNG("Textures/bombexpnew.png"));
+			wall = loadTexture(loadPNG("Textures/wall.png"));
+			while (!quit) {
+				SDL_RenderCopy(render, gexp, NULL, NULL);
+				for (int i = 0; i < maze.size(); i++) {
+					for (int j = 0; j < maze.size(); j++) {
+						if (!maze[i][j]) {
+							SDL_Rect t = { i * SPRITE,j * SPRITE,SPRITE,SPRITE };
+							SDL_RenderCopy(render, wall, NULL, &t);
+						}
+					}
+				}
 				frame++;
-				if (schedule!=-1){
+				if (schedule != -1) {
 					schedule--;
-					if (schedule%10==0){
+					if (schedule % 10 == 0) {
 						eid++;
-						pair<int,int> temp=pspawn(p1.x,p1.y,p2.x,p2.y,loc);
-                                        	en.push_back(Enemy(eid,loadTexture(loadPNG("Textures/enemy.png")),temp));
+						pair<int, int> temp = pspawn(p1.x, p1.y, p2.x, p2.y, loc);
+						en.push_back(Enemy(eid, loadTexture(loadPNG("Textures/enemy.png")), temp));
 						loc.push_back(temp);
 					}
 				}
-				if(frame==360){
-					frame=0;
+				if (frame == 360) {
+					frame = 0;
 					eid++;
-					pair<int,int> temp=pspawn(p1.x,p1.y,p2.x,p2.y,loc);
-					en.push_back(Enemy(eid,loadTexture(loadPNG("Textures/enemy.png")),temp));
+					pair<int, int> temp = pspawn(p1.x, p1.y, p2.x, p2.y, loc);
+					en.push_back(Enemy(eid, loadTexture(loadPNG("Textures/enemy.png")), temp));
 					loc.push_back(temp);
 				}
-				int store[4]={p1.x,p1.y,p2.x,p2.y};
+				int store[4] = { p1.x,p1.y,p2.x,p2.y };
 				p1.passiveAnimate();
 				p2.passiveAnimate();
 				SDL_PumpEvents();
-				const Uint8* keystate=SDL_GetKeyboardState(NULL);
-				if (keystate[SDL_SCANCODE_UP]){
-					if (p1.choose==0){
-						if (p1.curr==0){
-						
-							p1.y=p1.y-SPRITE/2; p1.moving=1;
-                                                } else {
-                                                        p1.curr=0;
-                                                }
-					}
-				} else if (keystate[SDL_SCANCODE_DOWN]){
-					if (p1.choose==0){
-						if (p1.curr==2){
-                                                        p1.y=p1.y+SPRITE/2; p1.moving=1;
-                                                } else {
-                                                        p1.curr=2;
-                                                }
-					}
-				} else if (keystate[SDL_SCANCODE_LEFT]){
-					if (p1.choose==0){
-						if (p1.curr==1){
-                                                        p1.x=p1.x-SPRITE/2; p1.moving=1;
-                                                } else {
-                                                        p1.curr=1;
-                                                }
-					}
-				} else if (keystate[SDL_SCANCODE_RIGHT]){
-					if (p1.choose==0){
-						if (p1.curr==3){
-                                                        p1.x=p1.x+SPRITE/2; p1.moving=1;
-                                                } else {
-                                                        p1.curr=3;
-                                                }
-					}
-				} else if (keystate[SDL_SCANCODE_SPACE]){
-					if (p1.choose==0){
-						p1.choose=1;
-					}
-				} else if (keystate[SDL_SCANCODE_L]){
-					if (p1.choose==0){
-						bombs.push_back(Bomb(p1.x,p1.y,p1.curr,maze,bombidle,bombexp));
-			      			p1.choose=2;
-					}
-				}		
-				if (keystate[SDL_SCANCODE_W]){
-                                        if (p2.choose==0){
-                                                if (p2.curr==0){
-                                                        p2.y=p2.y-SPRITE/2; p2.moving=1;
-                                                } else {
-                                                        p2.curr=0;
-                                                }
-					}
-                                } else if (keystate[SDL_SCANCODE_S]){
-                                        if (p2.choose==0){
-                                                if (p2.curr==2){
-                                                        p2.y=p2.y+SPRITE/2; p2.moving=1;
-                                                } else {
-                                                        p2.curr=2;
-                                                }
-                                        }
-                                } else if (keystate[SDL_SCANCODE_A]){
-                                        if (p2.choose==0){
-                                                if (p2.curr==1){
-                                                        p2.x=p2.x-SPRITE/2; p2.moving=1;
-                                                } else {
-                                                        p2.curr=1;
-                                                }
-                                        }
-                                } else if (keystate[SDL_SCANCODE_D]){
-                                        if (p2.choose==0){
-                                                if (p2.curr==3){
-                                                        p2.x=p2.x+SPRITE/2; p2.moving=1;
-                                                } else {
-                                                        p2.curr=3;
-                                                }
-                                        }
-                                } else if (keystate[SDL_SCANCODE_Q]){
-					if (p2.choose==0){
-                                        	p2.choose=1;
-					}
-                                } else if (keystate[SDL_SCANCODE_E]){
-					if (p2.choose==0){
-						bombs.push_back(Bomb(p2.x,p2.y,p2.curr,maze,bombidle,bombexp));
-						p2.choose=2;
+				const Uint8* keystate = SDL_GetKeyboardState(NULL);
+				if (keystate[SDL_SCANCODE_UP]) {
+					if (p1.choose == 0) {
+						if (p1.curr == 0) {
+
+							p1.y = p1.y - SPRITE / 2; p1.moving = 1;
+						}
+						else {
+							p1.curr = 0;
+						}
 					}
 				}
-				while(SDL_PollEvent(&e)){
-					if (e.type==SDL_QUIT){
-						quit=true;
+				else if (keystate[SDL_SCANCODE_DOWN]) {
+					if (p1.choose == 0) {
+						if (p1.curr == 2) {
+							p1.y = p1.y + SPRITE / 2; p1.moving = 1;
+						}
+						else {
+							p1.curr = 2;
+						}
 					}
 				}
-				if (CollisionMaze(p1.x,p1.y,SCREEN_WIDTH,SCREEN_HEIGHT,SPRITE,maze,loc)){
-					p1.x=store[0];
-					p1.y=store[1];
-					p1.moving=0;
+				else if (keystate[SDL_SCANCODE_LEFT]) {
+					if (p1.choose == 0) {
+						if (p1.curr == 1) {
+							p1.x = p1.x - SPRITE / 2; p1.moving = 1;
+						}
+						else {
+							p1.curr = 1;
+						}
+					}
 				}
-				if (CollisionMaze(p2.x,p2.y,SCREEN_WIDTH,SCREEN_HEIGHT,SPRITE,maze,loc)){
-                                        p2.x=store[2];
-                                        p2.y=store[3];
-                                        p2.moving=0;
-                                }
-				vector<pair<int,int>> etemp=move(p1.y,p1.x,p2.y,p2.x,loc);
-				for (int i=0;i<bombs.size();++i){
-                                        bombs[i].Tick();
-                                        bombs[i].RenderBomb(render);
-					ehit=bombs[i].check(&p1,&p2,en);
-                                }
-                                vector<Bomb> temp;
-                                for(auto i:bombs){
-                                        if (i.spawntimer!=0){
-                                                temp.push_back(i);
-                                        }
-                                }
-                                bombs=temp;
-				vector<pair<int,int>> tloc;
+				else if (keystate[SDL_SCANCODE_RIGHT]) {
+					if (p1.choose == 0) {
+						if (p1.curr == 3) {
+							p1.x = p1.x + SPRITE / 2; p1.moving = 1;
+						}
+						else {
+							p1.curr = 3;
+						}
+					}
+				}
+				else if (keystate[SDL_SCANCODE_SPACE]) {
+					if (p1.choose == 0) {
+						bul.push_back(bullet(p1.curr, p1.x, p1.y, 2));
+						p1.choose = 1;
+					}
+				}
+				else if (keystate[SDL_SCANCODE_L]) {
+					if (p1.choose == 0) {
+						bombs.push_back(Bomb(p1.x, p1.y, p1.curr, maze, bombidle, bombexp));
+						p1.choose = 2;
+					}
+				}
+				if (keystate[SDL_SCANCODE_W]) {
+					if (p2.choose == 0) {
+						if (p2.curr == 0) {
+							p2.y = p2.y - SPRITE / 2; p2.moving = 1;
+						}
+						else {
+							p2.curr = 0;
+						}
+					}
+				}
+				else if (keystate[SDL_SCANCODE_S]) {
+					if (p2.choose == 0) {
+						if (p2.curr == 2) {
+							p2.y = p2.y + SPRITE / 2; p2.moving = 1;
+						}
+						else {
+							p2.curr = 2;
+						}
+					}
+				}
+				else if (keystate[SDL_SCANCODE_A]) {
+					if (p2.choose == 0) {
+						if (p2.curr == 1) {
+							p2.x = p2.x - SPRITE / 2; p2.moving = 1;
+						}
+						else {
+							p2.curr = 1;
+						}
+					}
+				}
+				else if (keystate[SDL_SCANCODE_D]) {
+					if (p2.choose == 0) {
+						if (p2.curr == 3) {
+							p2.x = p2.x + SPRITE / 2; p2.moving = 1;
+						}
+						else {
+							p2.curr = 3;
+						}
+					}
+				}
+				else if (keystate[SDL_SCANCODE_Q]) {
+					if (p2.choose == 0) {
+						bul.push_back(bullet(p2.curr, p2.x, p2.y, 2));
+						p2.choose = 1;
+					}
+				}
+				else if (keystate[SDL_SCANCODE_E]) {
+					if (p2.choose == 0) {
+						bombs.push_back(Bomb(p2.x, p2.y, p2.curr, maze, bombidle, bombexp));
+						p2.choose = 2;
+					}
+				}
+				while (SDL_PollEvent(&e)) {
+					if (e.type == SDL_QUIT) {
+						quit = true;
+					}
+				}
+				if (CollisionMaze(p1.x, p1.y, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE, maze, loc)) {
+					p1.x = store[0];
+					p1.y = store[1];
+					p1.moving = 0;
+				}
+				if (CollisionMaze(p2.x, p2.y, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE, maze, loc)) {
+					p2.x = store[2];
+					p2.y = store[3];
+					p2.moving = 0;
+				}
+				vector<pair<int, int>> etemp = move(p1.y, p1.x, p2.y, p2.x, loc);
+				for (int i = 0; i < bombs.size(); ++i) {
+					bombs[i].Tick();
+					bombs[i].RenderBomb(render);
+					vector<int>ehitt = bombs[i].check(&p1, &p2, en);
+					for (auto j : ehitt)
+						ehit.push_back(j);
+				}
+				vector<Bomb> temp;
+				for (auto i : bombs) {
+					if (i.spawntimer != 0) {
+						temp.push_back(i);
+					}
+				}
+				bombs = temp;
+				vector<bullet>bul1;
+				for (int i = 0; i < bul.size(); ++i)
+				{
+					int ehitt = bul[i].mvblt(en, p1.x, p1.y, p2.x, p2.y, p1.HP, p2.HP);
+					if(ehitt!=-1) ehit.push_back(ehitt);
+					if (bul[i].status == 1) bul1.push_back(bul[i]);
+				}
+				bul = bul1;
+				vector<pair<int, int>> tloc;
 				vector<Enemy> ten;
-				for (int i=0;i<etemp.size();++i){
-					if (find(ehit.begin(),ehit.end(),en[i].id)==ehit.end()){
-						int curr=finddir(loc[i],etemp[i]);
-						en[i].dir=curr;
-						en[i].locations=etemp[i];
-						en[i].RenderEnemy(etemp[i].first,etemp[i].second,render);
+				for (int i = 0; i < etemp.size(); ++i) {
+					if (find(ehit.begin(), ehit.end(), en[i].id) == ehit.end()) {
+						int curr = finddir(loc[i], etemp[i]);
+						en[i].dir = curr;
+						en[i].locations = etemp[i];
+						en[i].RenderEnemy(etemp[i].first, etemp[i].second, render);
 						ten.push_back(en[i]);
 						tloc.push_back(etemp[i]);
 					}
 				}
-				if (ehit.size()){
-					schedule=ehit.size()*10;
+				if (ehit.size()) {
+					schedule = ehit.size() * 10;
 				}
-				en=ten;
-				loc=tloc;
-				if (p1.HP<=0 && p2.HP<=0){
+				en = ten;
+				loc = tloc;
+				if (p1.HP <= 0 && p2.HP <= 0) {
 					cout << "Mutual Destruction\n";
-					quit=true;
-				} else if (p1.HP<=0){
+					quit = true;
+				}
+				else if (p1.HP <= 0) {
 					cout << "Player 2 won\n";
-					quit=true;
-				} else if (p2.HP<=0){
+					quit = true;
+				}
+				else if (p2.HP <= 0) {
 					cout << "Player 1 won\n";
-					quit=true;
+					quit = true;
 				}
-				p1.RenderPlayer(render,SDL_Rect{p1.x,p1.y,SPRITE,SPRITE});
-				p2.RenderPlayer(render,SDL_Rect{p2.x,p2.y,SPRITE,SPRITE});
-				RenderFont(render,font,p1.x,p1.y-10,p1.HP);
-				RenderFont(render,font,p2.x,p2.y-10,p2.HP);
-				for (auto i:en){
-					RenderFont(render,font,i.locations.first,i.locations.second-10,i.HP);
+				p1.RenderPlayer(render, SDL_Rect{ p1.x,p1.y,SPRITE,SPRITE });
+				p2.RenderPlayer(render, SDL_Rect{ p2.x,p2.y,SPRITE,SPRITE });
+				RenderFont(render, font, p1.x, p1.y - 10, p1.HP);
+				RenderFont(render, font, p2.x, p2.y - 10, p2.HP);
+				for (auto i : en) {
+					RenderFont(render, font, i.locations.first, i.locations.second - 10, i.HP);
 				}
-                        	SDL_RenderPresent(render);
+				SDL_RenderPresent(render);
 				SDL_RenderClear(render);
-				p1.moving=0; p2.moving=0;
-				SDL_Delay(1000/12);
+				p1.moving = 0; p2.moving = 0;
+				SDL_Delay(1000 / 12);
 			}
 		}
 	}
