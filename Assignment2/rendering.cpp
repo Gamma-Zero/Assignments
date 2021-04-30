@@ -141,7 +141,7 @@ int main(int argc, char* args[]) {
 				if (keystate[SDL_SCANCODE_UP]) {
 					if (p1.choose == 0) {
 						if (p1.curr == 0) {
-
+							if (!CollisionP1P2(p1.x, p1.y - 20, p2.x, p2.y))
 							p1.y = p1.y - SPRITE / 2; p1.moving = 1;
 						}
 						else {
@@ -152,7 +152,8 @@ int main(int argc, char* args[]) {
 				else if (keystate[SDL_SCANCODE_DOWN]) {
 					if (p1.choose == 0) {
 						if (p1.curr == 2) {
-							p1.y = p1.y + SPRITE / 2; p1.moving = 1;
+							if (!CollisionP1P2(p1.x, p1.y + 20, p2.x, p2.y))
+								p1.y = p1.y + SPRITE / 2; p1.moving = 1;
 						}
 						else {
 							p1.curr = 2;
@@ -162,7 +163,8 @@ int main(int argc, char* args[]) {
 				else if (keystate[SDL_SCANCODE_LEFT]) {
 					if (p1.choose == 0) {
 						if (p1.curr == 1) {
-							p1.x = p1.x - SPRITE / 2; p1.moving = 1;
+							if (!CollisionP1P2(p1.x - 20, p1.y, p2.x, p2.y))
+								p1.x = p1.x - SPRITE / 2; p1.moving = 1;
 						}
 						else {
 							p1.curr = 1;
@@ -172,7 +174,8 @@ int main(int argc, char* args[]) {
 				else if (keystate[SDL_SCANCODE_RIGHT]) {
 					if (p1.choose == 0) {
 						if (p1.curr == 3) {
-							p1.x = p1.x + SPRITE / 2; p1.moving = 1;
+							if(!CollisionP1P2(p1.x+20, p1.y, p2.x, p2.y))
+								p1.x = p1.x + SPRITE / 2; p1.moving = 1;
 						}
 						else {
 							p1.curr = 3;
@@ -194,7 +197,8 @@ int main(int argc, char* args[]) {
 				if (keystate[SDL_SCANCODE_W]) {
 					if (p2.choose == 0) {
 						if (p2.curr == 0) {
-							p2.y = p2.y - SPRITE / 2; p2.moving = 1;
+							if (!CollisionP1P2(p1.x, p1.y, p2.x, p2.y - 20))
+								p2.y = p2.y - SPRITE / 2; p2.moving = 1;
 						}
 						else {
 							p2.curr = 0;
@@ -204,7 +208,8 @@ int main(int argc, char* args[]) {
 				else if (keystate[SDL_SCANCODE_S]) {
 					if (p2.choose == 0) {
 						if (p2.curr == 2) {
-							p2.y = p2.y + SPRITE / 2; p2.moving = 1;
+							if (!CollisionP1P2(p1.x, p1.y, p2.x, p2.y + 20))
+								p2.y = p2.y + SPRITE / 2; p2.moving = 1;
 						}
 						else {
 							p2.curr = 2;
@@ -214,7 +219,8 @@ int main(int argc, char* args[]) {
 				else if (keystate[SDL_SCANCODE_A]) {
 					if (p2.choose == 0) {
 						if (p2.curr == 1) {
-							p2.x = p2.x - SPRITE / 2; p2.moving = 1;
+							if (!CollisionP1P2(p1.x, p1.y, p2.x - 20, p2.y))
+								p2.x = p2.x - SPRITE / 2; p2.moving = 1;
 						}
 						else {
 							p2.curr = 1;
@@ -224,7 +230,8 @@ int main(int argc, char* args[]) {
 				else if (keystate[SDL_SCANCODE_D]) {
 					if (p2.choose == 0) {
 						if (p2.curr == 3) {
-							p2.x = p2.x + SPRITE / 2; p2.moving = 1;
+							if (!CollisionP1P2(p1.x, p1.y, p2.x + 20, p2.y))
+								p2.x = p2.x + SPRITE / 2; p2.moving = 1;
 						}
 						else {
 							p2.curr = 3;
