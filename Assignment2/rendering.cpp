@@ -344,13 +344,19 @@ int main(int argc, char* args[]) {
 						en[i].RenderEnemy(etemp[i].first, etemp[i].second, render);
 						ten.push_back(en[i]);
 						tloc.push_back(etemp[i]);
+					} else {
+						tokill.push_back(en[i]);
 					}
 				}
 				if (ehit.size()) {
-					schedule += ehit.size() * 10;
+					schedule += ehit.size() * 20;
 				}
 				en = ten;
 				loc = tloc;
+				ten.clear();
+				for (auto i:tokill){
+					i.triggerDeath(render);
+				}
 				if (p1.HP <= 0 && p2.HP <= 0) {
 					cout << "Mutual Destruction\n";
 					quit = true;
@@ -365,8 +371,8 @@ int main(int argc, char* args[]) {
 				}
 				p1.RenderPlayer(render, SDL_Rect{ p1.x,p1.y,SPRITE,SPRITE });
 				p2.RenderPlayer(render, SDL_Rect{ p2.x,p2.y,SPRITE,SPRITE });
-				RenderFont(render, font, p1.x, p1.y - 10, p1.HP);
-				RenderFont(render, font, p2.x, p2.y - 10, p2.HP);
+				RenderFont(render, font, p1.x, p1.y - 10, max(p1.HP,0));
+				RenderFont(render, font, p2.x, p2.y - 10, max(p2.HP,0));
 				for (auto i : en) {
 					RenderFont(render, font, i.locations.first, i.locations.second - 10, i.HP);
 				}
