@@ -1,7 +1,7 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_mixer.h>
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
+#include <SDL_mixer.h>
 #include <bits/stdc++.h>
 #include "projectiles.h"
 #include "Global.h"
@@ -18,16 +18,16 @@ bool init() {
 	}
 	else
 	{
-		if (SDL_Init(SDL_INIT_AUDIO) < 0){
-                        exit(1);
-                }
-                Mix_Init(0);
-                Mix_OpenAudio(22050,AUDIO_S16SYS,2,640);
+		if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+			exit(1);
+		}
+		Mix_Init(0);
+		Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 640);
 		TTF_Init();
-		bgm=Mix_LoadMUS("Audio/bgm.mp3");
-		bombsound=Mix_LoadWAV("Audio/bomb.wav");
-		bowsound=Mix_LoadWAV("Audio/bow.wav");
-		window = SDL_CreateWindow("Darkest Curse of the Dead Cells", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
+		bgm = Mix_LoadMUS("Audio/bgm.mp3");
+		bombsound = Mix_LoadWAV("Audio/bomb.wav");
+		bowsound = Mix_LoadWAV("Audio/bow.wav");
+		window = SDL_CreateWindow("Darkest Curse of the Dead Cells", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 		if (window == NULL)
 		{
 			printf("Window died: %s\n", SDL_GetError());
@@ -105,24 +105,24 @@ int main(int argc, char* args[]) {
 			bool quit = false;
 			SDL_Event e;
 			SDL_RenderClear(render);
-			vector<pair<int, int>> loc = randspawn(40,40, 920, 920);
+			vector<pair<int, int>> loc = randspawn(200,200, 680,680);
 			for (auto i : loc) {
 				eid++;
 				en.push_back(Enemy(eid, loadTexture(loadPNG("Textures/enemy.png")), i));
 			}
-			Player p1 = Player(loadTexture(loadPNG("Textures/p1.png")), 40, 40);
-			Player p2 = Player(loadTexture(loadPNG("Textures/p2.png")), 920, 920);
+			Player p1 = Player(loadTexture(loadPNG("Textures/p1.png")), 200,200);
+			Player p2 = Player(loadTexture(loadPNG("Textures/p2.png")), 680,680);
 			SDL_Texture* bombidle = loadTexture(loadPNG("Textures/bomb.png"));
 			SDL_Texture* bombexp = loadTexture(loadPNG("Textures/bombexpnew.png"));
 			arrow = loadTexture(loadPNG("Textures/arrow-scaled.png"));
 			wall = loadTexture(loadPNG("Textures/wall.png"));
-			lb=loadTexture(loadPNG("Textures/lootbox.png"));
+			lb = loadTexture(loadPNG("Textures/lootbox.png"));
 			int timer1 = -1; int timer2 = -1;
-			Mix_PlayMusic(bgm,1);
+			Mix_PlayMusic(bgm, 1);
 			while (!quit) {
 				SDL_RenderCopy(render, gexp, NULL, NULL);
-				SDL_Rect out={1000,0,200,1000};
-				SDL_RenderFillRect(render,&out);
+				SDL_Rect out = { 1000,0,200,1000 };
+				SDL_RenderFillRect(render, &out);
 				for (int i = 0; i < maze.size(); i++) {
 					for (int j = 0; j < maze.size(); j++) {
 						if (!maze[i][j]) {
@@ -224,15 +224,15 @@ int main(int argc, char* args[]) {
 					}
 				}
 				else if (keystate[SDL_SCANCODE_SPACE]) {
-					if (p1.carrow>0 && p1.choose == 0) {
-						Mix_PlayChannel(-1,bowsound,0);
+					if (p1.carrow > 0 && p1.choose == 0) {
+						Mix_PlayChannel(-1, bowsound, 0);
 						p1.carrow--;
 						timer1 = 5;
 						p1.choose = 1;
 					}
 				}
 				else if (keystate[SDL_SCANCODE_L]) {
-					if (p1.cbomb>0 && p1.choose == 0) {
+					if (p1.cbomb > 0 && p1.choose == 0) {
 						p1.cbomb--;
 						bombs.push_back(Bomb(p1.x, p1.y, p1.curr, maze, 1, bombidle, bombexp));
 						p1.choose = 2;
@@ -283,35 +283,37 @@ int main(int argc, char* args[]) {
 					}
 				}
 				else if (keystate[SDL_SCANCODE_Q]) {
-					if (p2.carrow>0 && p2.choose == 0) {
-						Mix_PlayChannel(-1,bowsound,0);
+					if (p2.carrow > 0 && p2.choose == 0) {
+						Mix_PlayChannel(-1, bowsound, 0);
 						p2.carrow--;
 						timer2 = 5;
 						p2.choose = 1;
 					}
 				}
 				else if (keystate[SDL_SCANCODE_E]) {
-					if (p2.cbomb>0 && p2.choose == 0) {
+					if (p2.cbomb > 0 && p2.choose == 0) {
 						p2.cbomb--;
-						bombs.push_back(Bomb(p2.x, p2.y, p2.curr, maze,2, bombidle, bombexp));
+						bombs.push_back(Bomb(p2.x, p2.y, p2.curr, maze, 2, bombidle, bombexp));
 						p2.choose = 2;
 					}
 				}
 
 
 				int j1 = p1.x / 40, j2 = (p1.y + 39) / 40;
-				if (things[j1][j2] == 1) p1.carrow++;
-				else if (things[j1][j2] == 2) p1.HP += 20;
-				else if (things[j1][j2] == 3) p1.cbomb++;
-				else if(things[j1][j2]==4) p1.score+=5;
+				for(auto cc:things[j1][j2])
+				if (cc == 1) p1.carrow++;
+				else if (cc == 2) p1.HP += 20;
+				else if (cc == 3) p1.cbomb++;
+				else if (cc == 4) p1.score += 5;
 				//cout <<1<<' '<< p1.score << ' ' << p1.carrow << ' ' << p1.cbomb << ' ' << p1.HP << '\n';
-				things[j1][j2] = 0;
+				things[j1][j2].clear();
 				j1 = p2.x / 40; j2 = (p2.y + 39) / 40;
-				if (things[j1][j2] == 1) p2.carrow++;
-				else if (things[j1][j2] == 2) p2.HP += 20;
-				else if (things[j1][j2] == 3) p2.cbomb++;
-				else if (things[j1][j2] == 4) p2.score+=5;
-				things[j1][j2] = 0;
+				for(auto cc:things[j1][j2])
+				if (cc == 1) p2.carrow++;
+				else if (cc == 2) p2.HP += 20;
+				else if (cc == 3) p2.cbomb++;
+				else if (cc == 4) p2.score += 5;
+				things[j1][j2].clear();
 				p1.HP = min(p1.HP, 100);
 				p2.HP = min(p2.HP, 100);
 				//cout << 2<<' '<<p2.score << ' ' << p2.carrow << ' ' << p2.cbomb << ' ' << p2.HP << '\n';
@@ -364,9 +366,9 @@ int main(int argc, char* args[]) {
 					en[i].locations = etemp[i];
 				}
 				vector<Bomb> temp;
-				for (int i=0; i<bombs.size(); ++i) {
-					if (bombs[i].spawntimer==8){
-						Mix_PlayChannel(-1,bombsound,0);
+				for (int i = 0; i < bombs.size(); ++i) {
+					if (bombs[i].spawntimer == 8) {
+						Mix_PlayChannel(-1, bombsound, 0);
 					}
 					if (bombs[i].spawntimer != 0) {
 						temp.push_back(bombs[i]);
@@ -402,10 +404,10 @@ int main(int argc, char* args[]) {
 					}
 					else
 					{
-						if (pl[it-ehit.begin()] == 1) ++p1.score;
+						if (pl[it - ehit.begin()] == 1) ++p1.score;
 						else ++p2.score;
-						int surprise=gift();
-						things[etemp[i].first / 40][(etemp[i].second + 39) / 40] = surprise;
+						int surprise = gift();
+						things[etemp[i].first / 40][(etemp[i].second + 39) / 40].push_back(surprise);
 						tokill.push_back(en[i]);
 					}
 				}
@@ -415,12 +417,12 @@ int main(int argc, char* args[]) {
 				en = ten;
 				loc = tloc;
 				ten.clear();
-				for (int i = 0;i<tokill.size();++i){
-                                        if (!tokill[i].triggerDeath(render)){
-                                                ten.push_back(tokill[i]);
-                                        }
-                                }
-                                tokill=ten;
+				for (int i = 0; i < tokill.size(); ++i) {
+					if (!tokill[i].triggerDeath(render)) {
+						ten.push_back(tokill[i]);
+					}
+				}
+				tokill = ten;
 				p1.HP = max(p1.HP, 0);
 				p2.HP = max(p2.HP, 0);
 				if (p1.HP > 0 && p2.HP <= 0)
@@ -440,10 +442,10 @@ int main(int argc, char* args[]) {
 					else cout << "Mutual Destruction";
 					quit = true;
 				}
-				for (int i=0;i<25;++i){
-					for (int j=0;j<25;++j){
-						if (things[i][j]!=0){
-							RenderBox(lb,render,i,j);
+				for (int i = 0; i < 25; ++i) {
+					for (int j = 0; j < 25; ++j) {
+						if (things[i][j].size() != 0) {
+							RenderBox(lb, render, i, j);
 						}
 					}
 				}
@@ -454,7 +456,7 @@ int main(int argc, char* args[]) {
 				for (auto i : en) {
 					RenderFont(render, font, i.locations.first, i.locations.second - 10, i.HP);
 				}
-				RenderData(p1,p2,render,font);
+				RenderData(p1, p2, render, font);
 				SDL_RenderPresent(render);
 				SDL_RenderClear(render);
 				p1.moving = 0; p2.moving = 0;
@@ -467,3 +469,4 @@ int main(int argc, char* args[]) {
 	close();
 	return 0;
 }
+
