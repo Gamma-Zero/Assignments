@@ -46,7 +46,7 @@ bool init() {
 				}
 				else {
 					maze = MazeGenerate();
-					SDL_SetRenderDrawColor(render, 0xFF, 0xFF, 0xFF, 0xFF);
+					SDL_SetRenderDrawColor(render, 0, 0, 0, 0);
 					screenSurface = SDL_GetWindowSurface(window);
 					font = TTF_OpenFont("Fonts/Raleway-Black.ttf", 20);
 				}
@@ -114,10 +114,13 @@ int main(int argc, char* args[]) {
 			SDL_Texture* bombexp = loadTexture(loadPNG("Textures/bombexpnew.png"));
 			arrow = loadTexture(loadPNG("Textures/arrow-scaled.png"));
 			wall = loadTexture(loadPNG("Textures/wall.png"));
+			lb=loadTexture(loadPNG("Textures/lootbox.png"));
 			int timer1 = -1; int timer2 = -1;
 			Mix_PlayMusic(bgm,1);
 			while (!quit) {
 				SDL_RenderCopy(render, gexp, NULL, NULL);
+				SDL_Rect out={1000,0,200,1000};
+				SDL_RenderFillRect(render,&out);
 				for (int i = 0; i < maze.size(); i++) {
 					for (int j = 0; j < maze.size(); j++) {
 						if (!maze[i][j]) {
@@ -430,6 +433,13 @@ int main(int argc, char* args[]) {
 					else cout << "Mutual Destruction";
 					quit = true;
 				}
+				for (int i=0;i<25;++i){
+					for (int j=0;j<25;++j){
+						if (things[i][j]!=0){
+							RenderBox(lb,render,i,j);
+						}
+					}
+				}
 				p1.RenderPlayer(render, SDL_Rect{ p1.x,p1.y,SPRITE,SPRITE });
 				p2.RenderPlayer(render, SDL_Rect{ p2.x,p2.y,SPRITE,SPRITE });
 				RenderFont(render, font, p1.x, p1.y - 10, p1.HP);
@@ -437,6 +447,7 @@ int main(int argc, char* args[]) {
 				for (auto i : en) {
 					RenderFont(render, font, i.locations.first, i.locations.second - 10, i.HP);
 				}
+				RenderData(p1,p2,render,font);
 				SDL_RenderPresent(render);
 				SDL_RenderClear(render);
 				p1.moving = 0; p2.moving = 0;

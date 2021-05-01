@@ -119,3 +119,8 @@ struct Bomb{
 		return ehit;
 	}
 };
+
+void RenderBox(SDL_Texture* s, SDL_Renderer* render, int x, int y){
+	SDL_Rect space={x*40,y*40,40,40};
+	SDL_RenderCopy(render,s,NULL,&space);
+}

@@ -1,4 +1,4 @@
-const int SCREEN_WIDTH = 1000;
+const int SCREEN_WIDTH = 1200;
 const int SCREEN_HEIGHT = 1000;
 const int SPRITE = 40;
 const int FPS = 60;
@@ -8,6 +8,7 @@ SDL_Surface* screenSurface = NULL;
 SDL_Renderer* render=NULL;
 SDL_Texture* wall=NULL;
 SDL_Texture* arrow=NULL;
+SDL_Texture* lb=NULL;
 TTF_Font *font=NULL;
 vector<vector<bool>> maze;
 vector<Bomb> bombs;
