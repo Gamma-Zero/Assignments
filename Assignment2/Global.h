@@ -21,3 +21,4 @@ int frame=0;
 int eid=0;
 int schedule=-1;
 Mix_Music *bgm;
+Mix_Chunk *bombsound, *bowsound;

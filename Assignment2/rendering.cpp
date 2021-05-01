@@ -25,6 +25,8 @@ bool init() {
                 Mix_OpenAudio(22050,AUDIO_S16SYS,2,640);
 		TTF_Init();
 		bgm=Mix_LoadMUS("Audio/bgm.mp3");
+		bombsound=Mix_LoadWAV("Audio/bomb.wav");
+		bowsound=Mix_LoadWAV("Audio/bow.wav");
 		window = SDL_CreateWindow("Darkest Curse of the Dead Cells", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
 		if (window == NULL)
 		{
@@ -223,6 +225,7 @@ int main(int argc, char* args[]) {
 				}
 				else if (keystate[SDL_SCANCODE_SPACE]) {
 					if (p1.carrow>0 && p1.choose == 0) {
+						Mix_PlayChannel(-1,bowsound,0);
 						p1.carrow--;
 						timer1 = 5;
 						p1.choose = 1;
@@ -281,6 +284,7 @@ int main(int argc, char* args[]) {
 				}
 				else if (keystate[SDL_SCANCODE_Q]) {
 					if (p2.carrow>0 && p2.choose == 0) {
+						Mix_PlayChannel(-1,bowsound,0);
 						p2.carrow--;
 						timer2 = 5;
 						p2.choose = 1;
@@ -361,6 +365,9 @@ int main(int argc, char* args[]) {
 				}
 				vector<Bomb> temp;
 				for (int i=0; i<bombs.size(); ++i) {
+					if (bombs[i].spawntimer==8){
+						Mix_PlayChannel(-1,bombsound,0);
+					}
 					if (bombs[i].spawntimer != 0) {
 						temp.push_back(bombs[i]);
 					}
