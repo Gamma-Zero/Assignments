@@ -16,7 +16,7 @@ vector<bullet>bul;
 vector<Enemy> en;
 vector<Enemy> tokill;
 vector<int> ehit, pl;
-vector<vector<int>>things(25, vector<int>(25));
+vector<vector<vector<int>>>things(25, vector<vector<int>>(25));
 int frame=0;
 int eid=0;
 int schedule=-1;
