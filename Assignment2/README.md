@@ -1,1 +1,1 @@
-New Bug Detected: Problem with changing structs. Remember to discuss tomorrow.
+Background Music: Kaine/Escape from NieR Replicant (Keiichi Okabe)

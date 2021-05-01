@@ -1,6 +1,7 @@
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include <bits/stdc++.h>
 #include "projectiles.h"
 #include "Global.h"
@@ -17,7 +18,13 @@ bool init() {
 	}
 	else
 	{
+		if (SDL_Init(SDL_INIT_AUDIO) < 0){
+                        exit(1);
+                }
+                Mix_Init(0);
+                Mix_OpenAudio(22050,AUDIO_S16SYS,2,640);
 		TTF_Init();
+		bgm=Mix_LoadMUS("Audio/bgm.mp3");
 		window = SDL_CreateWindow("Darkest Curse of the Dead Cells", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
 		if (window == NULL)
 		{
@@ -96,18 +103,19 @@ int main(int argc, char* args[]) {
 			bool quit = false;
 			SDL_Event e;
 			SDL_RenderClear(render);
-			vector<pair<int, int>> loc = randspawn(200,200, 680, 680);
+			vector<pair<int, int>> loc = randspawn(40,40, 920, 920);
 			for (auto i : loc) {
 				eid++;
 				en.push_back(Enemy(eid, loadTexture(loadPNG("Textures/enemy.png")), i));
 			}
-			Player p1 = Player(loadTexture(loadPNG("Textures/p1.png")), 200, 200);
-			Player p2 = Player(loadTexture(loadPNG("Textures/p2.png")), 680, 680);
+			Player p1 = Player(loadTexture(loadPNG("Textures/p1.png")), 40, 40);
+			Player p2 = Player(loadTexture(loadPNG("Textures/p2.png")), 920, 920);
 			SDL_Texture* bombidle = loadTexture(loadPNG("Textures/bomb.png"));
 			SDL_Texture* bombexp = loadTexture(loadPNG("Textures/bombexpnew.png"));
 			arrow = loadTexture(loadPNG("Textures/arrow-scaled.png"));
 			wall = loadTexture(loadPNG("Textures/wall.png"));
 			int timer1 = -1; int timer2 = -1;
+			Mix_PlayMusic(bgm,1);
 			while (!quit) {
 				SDL_RenderCopy(render, gexp, NULL, NULL);
 				for (int i = 0; i < maze.size(); i++) {
@@ -121,7 +129,7 @@ int main(int argc, char* args[]) {
 				frame++;
 				if (schedule != -1) {
 					schedule--;
-					if (schedule % 100 == 0) {
+					if (schedule % 20 == 0) {
 						eid++;
 						pair<int, int> temp = pspawn(p1.x, p1.y, p2.x, p2.y, loc);
 						en.push_back(Enemy(eid, loadTexture(loadPNG("Textures/enemy.png")), temp));
@@ -349,9 +357,9 @@ int main(int argc, char* args[]) {
 					en[i].locations = etemp[i];
 				}
 				vector<Bomb> temp;
-				for (auto i : bombs) {
-					if (i.spawntimer != 0) {
-						temp.push_back(i);
+				for (int i=0; i<bombs.size(); ++i) {
+					if (bombs[i].spawntimer != 0) {
+						temp.push_back(bombs[i]);
 					}
 				}
 				bombs = temp;
@@ -388,13 +396,21 @@ int main(int argc, char* args[]) {
 						else ++p2.score;
 						int surprise=gift();
 						things[etemp[i].first / 40][(etemp[i].second + 39) / 40] = surprise;
+						tokill.push_back(en[i]);
 					}
 				}
 				if (ehit.size()) {
-					schedule += ehit.size() * 100;   //changes
+					schedule += 20;   //changes
 				}
 				en = ten;
 				loc = tloc;
+				ten.clear();
+				for (int i = 0;i<tokill.size();++i){
+                                        if (!tokill[i].triggerDeath(render)){
+                                                ten.push_back(tokill[i]);
+                                        }
+                                }
+                                tokill=ten;
 				p1.HP = max(p1.HP, 0);
 				p2.HP = max(p2.HP, 0);
 				if (p1.HP > 0 && p2.HP <= 0)
