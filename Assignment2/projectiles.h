@@ -2,7 +2,7 @@
 #include "CollisionDetection.h"
 
 struct Bomb{
-	int x,y;
+	int x,y,id;
 	int spawntimer=30;	
 	SDL_Texture* bombidle;
 	SDL_Texture* bombexp;
@@ -12,7 +12,8 @@ struct Bomb{
 	vector<pair<int,int>> plumes;
 	vector<int> playershurt;
 	vector<int> enemieshurt;
-	Bomb(int x1, int y1, int dir, vector<vector<bool>> mat, SDL_Texture* bi, SDL_Texture* be){
+	Bomb(int x1, int y1, int dir, vector<vector<bool>> mat, int w, SDL_Texture* bi, SDL_Texture* be){
+		id = w;
 		y=((y1+SPRITE-1)/SPRITE)*SPRITE;
 		if (dir==3){
 			x=((x1+SPRITE-1)/SPRITE)*SPRITE;
