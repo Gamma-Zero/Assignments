@@ -1,5 +1,6 @@
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include "spawnnew.h"
+#include "reward.h"
 
 struct Anim {
 	SDL_Rect space;
@@ -25,14 +26,14 @@ struct Player {
 	Anim walkanimation;
 	Anim shootanimation;
 	Anim bombanimation;
-	Anim deathanimation;
 	int ssheeth, ssheetw;
 	int choose;
 	int rest=0;
 	bool moving;
-	int x, y;
+	int x, y, score=0;
 	int curr;
 	int HP = 100;
+	int carrow = 10, cbomb = 5;
 	Player(SDL_Texture* s, int x1, int y1) {
 		sprites = s;
 		SDL_QueryTexture(s, NULL, NULL, &ssheetw, &ssheeth);
@@ -45,9 +46,6 @@ struct Player {
 		bombanimation.y = 2 * ssheetw / 13;
 		bombanimation.w = ssheetw / 13;
 		bombanimation.h = ssheeth / 21;
-		deathanimation.y = 20 * ssheeth / 21;
-		deathanimation.w = ssheetw / 13;
-		deathanimation.h = ssheeth / 21;
 		x = x1;
 		y = y1;
 		choose = 0;
@@ -101,23 +99,12 @@ struct Player {
 	void upHP(int val) {
 		HP = val;
 	}
-	bool triggerDeath(SDL_Renderer* render){
-		if (deathanimation.x==6*ssheetw/13){
-			return true;
-		} else {
-			SDL_Rect space={x,y,40,40};
-			SDL_RenderCopy(render, sprites, &deathanimation.space, &space);
-			deathanimation.x += ssheetw/13;
-			return false;
-		}
-	}
 };
 
 struct Enemy {
 	SDL_Texture* sprites;
 	int id;
 	Anim walkanimation;
-	Anim deathanimation;
 	int ssheeth, ssheetw;
 	pair<int, int> locations;
 	int dir;
@@ -127,7 +114,6 @@ struct Enemy {
 		sprites = s;
 		SDL_QueryTexture(s, NULL, NULL, &ssheetw, &ssheeth);
 		walkanimation = Anim(0, 10 * ssheeth / 21, ssheetw / 13, ssheeth / 21);
-		deathanimation = Anim(0, 20 * ssheeth / 21, ssheetw / 13, ssheeth / 21);
 		locations = loc;
 		dir = -1;
 		id = i;
@@ -142,16 +128,6 @@ struct Enemy {
 	void upHP(int val) {
 		HP = val;
 	}
-	bool triggerDeath(SDL_Renderer* render){
-                if (deathanimation.x==6*ssheetw/13){
-                        return true;
-                } else {
-                        SDL_Rect space={locations.first,locations.second,40,40};
-                        SDL_RenderCopy(render, sprites, &deathanimation.space, &space);
-                        deathanimation.x += ssheetw/13;
-                        return false;
-                }
-        }
 };
 
 int finddir(pair<int, int> s, pair<int, int> e) {
@@ -234,6 +210,29 @@ struct bullet
 			{
 				status = 0;
 				return en[i].id;
+			}
+			if (status == 1 && abs(enx - curx) + abs(eny - cury) == 1)
+			{
+				if (enx == curx + 1 && movedir == 3)
+				{
+					status = 0;
+					return en[i].id;
+				}
+				else if (enx == curx - 1 && movedir == 1)
+				{
+					status = 0;
+					return en[i].id;
+				}
+				else if (eny == cury - 1 && movedir==0)
+				{
+					status = 0;
+					return en[i].id;
+				}
+				else if (eny == cury + 1 && movedir == 2)
+				{
+					status = 0;
+					return en[i].id;
+				}
 			}
 		}
 		return -1;
