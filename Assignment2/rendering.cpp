@@ -1,6 +1,6 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
 #include <bits/stdc++.h>
 #include "projectiles.h"
 #include "Global.h"
@@ -18,7 +18,7 @@ bool init() {
 	else
 	{
 		TTF_Init();
-		window = SDL_CreateWindow("Darkest Curse of the Dead Cells", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE);
+		window = SDL_CreateWindow("Darkest Curse of the Dead Cells", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
 		if (window == NULL)
 		{
 			printf("Window died: %s\n", SDL_GetError());
@@ -96,18 +96,18 @@ int main(int argc, char* args[]) {
 			bool quit = false;
 			SDL_Event e;
 			SDL_RenderClear(render);
-			vector<pair<int, int>> loc = randspawn(40, 40, 920, 920);
+			vector<pair<int, int>> loc = randspawn(200,200, 680, 680);
 			for (auto i : loc) {
 				eid++;
 				en.push_back(Enemy(eid, loadTexture(loadPNG("Textures/enemy.png")), i));
 			}
-			Player p1 = Player(loadTexture(loadPNG("Textures/p1.png")), 40, 40);
-			Player p2 = Player(loadTexture(loadPNG("Textures/p2.png")), 920, 920);
+			Player p1 = Player(loadTexture(loadPNG("Textures/p1.png")), 200, 200);
+			Player p2 = Player(loadTexture(loadPNG("Textures/p2.png")), 680, 680);
 			SDL_Texture* bombidle = loadTexture(loadPNG("Textures/bomb.png"));
 			SDL_Texture* bombexp = loadTexture(loadPNG("Textures/bombexpnew.png"));
 			arrow = loadTexture(loadPNG("Textures/arrow-scaled.png"));
 			wall = loadTexture(loadPNG("Textures/wall.png"));
-			int timer1=-1; int timer2=-1;
+			int timer1 = -1; int timer2 = -1;
 			while (!quit) {
 				SDL_RenderCopy(render, gexp, NULL, NULL);
 				for (int i = 0; i < maze.size(); i++) {
@@ -121,7 +121,7 @@ int main(int argc, char* args[]) {
 				frame++;
 				if (schedule != -1) {
 					schedule--;
-					if (schedule % 10 == 0) {
+					if (schedule % 100 == 0) {
 						eid++;
 						pair<int, int> temp = pspawn(p1.x, p1.y, p2.x, p2.y, loc);
 						en.push_back(Enemy(eid, loadTexture(loadPNG("Textures/enemy.png")), temp));
@@ -144,9 +144,9 @@ int main(int argc, char* args[]) {
 				int g1 = p1.x / 40, g2 = p2.x / 40, h1 = (p1.y + 39) / 40, h2 = (p2.y + 39) / 40;
 				for (auto i : en)
 				{
-					int k1 = i.locations.first / 40, k2 =( i.locations.second + 39)/ 40;
-					if (abs(k1-g1)+abs(k2-h1)==1) danger1 = true;
-					if (abs(k1-g2)+abs(k2-h2)==1) danger2 = true;
+					int k1 = i.locations.first / 40, k2 = (i.locations.second + 39) / 40;
+					if (abs(k1 - g1) + abs(k2 - h1) == 1) danger1 = true;
+					if (abs(k1 - g2) + abs(k2 - h2) == 1) danger2 = true;
 				}
 				if (danger1)
 				{
@@ -170,7 +170,7 @@ int main(int argc, char* args[]) {
 					if (p1.choose == 0) {
 						if (p1.curr == 0) {
 							if (!CollisionP1P2(p1.x, p1.y - 20, p2.x, p2.y))
-							p1.y = p1.y - SPRITE / 2; p1.moving = 1;
+								p1.y = p1.y - SPRITE / 2; p1.moving = 1;
 						}
 						else {
 							p1.curr = 0;
@@ -202,7 +202,7 @@ int main(int argc, char* args[]) {
 				else if (keystate[SDL_SCANCODE_RIGHT]) {
 					if (p1.choose == 0) {
 						if (p1.curr == 3) {
-							if(!CollisionP1P2(p1.x+20, p1.y, p2.x, p2.y))
+							if (!CollisionP1P2(p1.x + 20, p1.y, p2.x, p2.y))
 								p1.x = p1.x + SPRITE / 2; p1.moving = 1;
 						}
 						else {
@@ -211,14 +211,16 @@ int main(int argc, char* args[]) {
 					}
 				}
 				else if (keystate[SDL_SCANCODE_SPACE]) {
-					if (p1.choose == 0) {
-						timer1=5;
+					if (p1.carrow>0 && p1.choose == 0) {
+						p1.carrow--;
+						timer1 = 5;
 						p1.choose = 1;
 					}
 				}
 				else if (keystate[SDL_SCANCODE_L]) {
-					if (p1.choose == 0) {
-						bombs.push_back(Bomb(p1.x, p1.y, p1.curr, maze, bombidle, bombexp));
+					if (p1.cbomb>0 && p1.choose == 0) {
+						p1.cbomb--;
+						bombs.push_back(Bomb(p1.x, p1.y, p1.curr, maze, 1, bombidle, bombexp));
 						p1.choose = 2;
 					}
 				}
@@ -267,34 +269,58 @@ int main(int argc, char* args[]) {
 					}
 				}
 				else if (keystate[SDL_SCANCODE_Q]) {
-					if (p2.choose == 0) {
-						timer2=5;
+					if (p2.carrow>0 && p2.choose == 0) {
+						p2.carrow--;
+						timer2 = 5;
 						p2.choose = 1;
 					}
 				}
 				else if (keystate[SDL_SCANCODE_E]) {
-					if (p2.choose == 0) {
-						bombs.push_back(Bomb(p2.x, p2.y, p2.curr, maze, bombidle, bombexp));
+					if (p2.cbomb>0 && p2.choose == 0) {
+						p2.cbomb--;
+						bombs.push_back(Bomb(p2.x, p2.y, p2.curr, maze,2, bombidle, bombexp));
 						p2.choose = 2;
 					}
 				}
+
+
+				int j1 = p1.x / 40, j2 = (p1.y + 39) / 40;
+				if (things[j1][j2] == 1) p1.carrow++;
+				else if (things[j1][j2] == 2) p1.HP += 20;
+				else if (things[j1][j2] == 3) p1.cbomb++;
+				else if(things[j1][j2]==4) p1.score+=5;
+				//cout <<1<<' '<< p1.score << ' ' << p1.carrow << ' ' << p1.cbomb << ' ' << p1.HP << '\n';
+				things[j1][j2] = 0;
+				j1 = p2.x / 40; j2 = (p2.y + 39) / 40;
+				if (things[j1][j2] == 1) p2.carrow++;
+				else if (things[j1][j2] == 2) p2.HP += 20;
+				else if (things[j1][j2] == 3) p2.cbomb++;
+				else if (things[j1][j2] == 4) p2.score+=5;
+				things[j1][j2] = 0;
+				p1.HP = min(p1.HP, 100);
+				p2.HP = min(p2.HP, 100);
+				//cout << 2<<' '<<p2.score << ' ' << p2.carrow << ' ' << p2.cbomb << ' ' << p2.HP << '\n';
+
+
 				while (SDL_PollEvent(&e)) {
 					if (e.type == SDL_QUIT) {
 						quit = true;
 					}
 				}
-				if (timer1>0){
-                                                timer1--;
-                                        } else if (timer1==0){
-                                                bul.push_back(bullet(arrow, p1.curr, p1.x, p1.y, 1));
-                                                timer1--;
-                                        }
-				if (timer2>0){
-                                                timer2--;
-                                        } else if (timer2==0){
-                                                bul.push_back(bullet(arrow, p2.curr, p2.x, p2.y, 2));
-                                                timer2--;
-                                        }
+				if (timer1 > 0) {
+					timer1--;
+				}
+				else if (timer1 == 0) {
+					bul.push_back(bullet(arrow, p1.curr, p1.x, p1.y, 1));
+					timer1--;
+				}
+				if (timer2 > 0) {
+					timer2--;
+				}
+				else if (timer2 == 0) {
+					bul.push_back(bullet(arrow, p2.curr, p2.x, p2.y, 2));
+					timer2--;
+				}
 				if (CollisionMaze(p1.x, p1.y, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE, maze, loc)) {
 					p1.x = store[0];
 					p1.y = store[1];
@@ -311,10 +337,16 @@ int main(int argc, char* args[]) {
 					bombs[i].RenderBomb(render);
 					vector<int>ehitt = bombs[i].check(&p1, &p2, en);
 					for (auto j : ehitt)
-						ehit.push_back(j);
+					{
+						if (find(ehit.begin(), ehit.end(), j) == ehit.end())
+						{
+							ehit.push_back(j);
+							pl.push_back(bombs[i].id);
+						}
+					}
 				}
-				for (int i=0;i<etemp.size();++i){
-					en[i].locations=etemp[i];
+				for (int i = 0; i < etemp.size(); ++i) {
+					en[i].locations = etemp[i];
 				}
 				vector<Bomb> temp;
 				for (auto i : bombs) {
@@ -327,52 +359,65 @@ int main(int argc, char* args[]) {
 				for (int i = 0; i < bul.size(); ++i)
 				{
 					int ehitt = bul[i].mvblt(en, p1.x, p1.y, p2.x, p2.y, p1.HP, p2.HP);
-					if(ehitt!=-1) ehit.push_back(ehitt);
+					if (ehitt != -1 && find(ehit.begin(), ehit.end(), ehitt) == ehit.end())
+					{
+						ehit.push_back(ehitt);
+						pl.push_back(bul[i].id);
+					}
 					if (bul[i].status == 1) bul1.push_back(bul[i]);
 				}
 				bul = bul1;
-				for (auto i:bul){
+				for (auto i : bul) {
 					i.RenderBullet(render);
 				}
 				vector<pair<int, int>> tloc;
 				vector<Enemy> ten;
 				for (int i = 0; i < etemp.size(); ++i) {
-					if (find(ehit.begin(), ehit.end(), en[i].id) == ehit.end()) {
+					auto it = find(ehit.begin(), ehit.end(), en[i].id);
+					if (it == ehit.end()) {
 						int curr = finddir(loc[i], etemp[i]);
 						en[i].dir = curr;
 						en[i].locations = etemp[i];
 						en[i].RenderEnemy(etemp[i].first, etemp[i].second, render);
 						ten.push_back(en[i]);
 						tloc.push_back(etemp[i]);
-					} else {
-						tokill.push_back(en[i]);
+					}
+					else
+					{
+						if (pl[it-ehit.begin()] == 1) ++p1.score;
+						else ++p2.score;
+						int surprise=gift();
+						things[etemp[i].first / 40][(etemp[i].second + 39) / 40] = surprise;
 					}
 				}
 				if (ehit.size()) {
-					schedule += ehit.size() * 20;
+					schedule += ehit.size() * 100;   //changes
 				}
 				en = ten;
 				loc = tloc;
-				ten.clear();
-				for (auto i:tokill){
-					i.triggerDeath(render);
-				}
-				if (p1.HP <= 0 && p2.HP <= 0) {
-					cout << "Mutual Destruction\n";
+				p1.HP = max(p1.HP, 0);
+				p2.HP = max(p2.HP, 0);
+				if (p1.HP > 0 && p2.HP <= 0)
+				{
+					cout << "Player 1 Wins!!";
 					quit = true;
 				}
-				else if (p1.HP <= 0) {
-					cout << "Player 2 won\n";
+				else if (p2.HP > 0 && p1.HP <= 0)
+				{
+					cout << "Player 2 Wins!!";
 					quit = true;
 				}
-				else if (p2.HP <= 0) {
-					cout << "Player 1 won\n";
+				else if (p1.HP <= 0 && p2.HP <= 0)
+				{
+					if (p1.score > p2.score) cout << "Player 1 Wins";
+					else if (p2.score > p1.score) cout << "Player 2 Wins";
+					else cout << "Mutual Destruction";
 					quit = true;
 				}
 				p1.RenderPlayer(render, SDL_Rect{ p1.x,p1.y,SPRITE,SPRITE });
 				p2.RenderPlayer(render, SDL_Rect{ p2.x,p2.y,SPRITE,SPRITE });
-				RenderFont(render, font, p1.x, p1.y - 10, max(p1.HP,0));
-				RenderFont(render, font, p2.x, p2.y - 10, max(p2.HP,0));
+				RenderFont(render, font, p1.x, p1.y - 10, p1.HP);
+				RenderFont(render, font, p2.x, p2.y - 10, p2.HP);
 				for (auto i : en) {
 					RenderFont(render, font, i.locations.first, i.locations.second - 10, i.HP);
 				}
@@ -381,6 +426,7 @@ int main(int argc, char* args[]) {
 				p1.moving = 0; p2.moving = 0;
 				SDL_Delay(1000 / 12);
 				ehit.clear();
+				pl.clear();
 			}
 		}
 	}
