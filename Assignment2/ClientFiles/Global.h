@@ -3,7 +3,7 @@
 #include <unistd.h>
 #define PORT 8080
 
-const int SCREEN_WIDTH = 1000;
+const int SCREEN_WIDTH = 1200;
 const int SCREEN_HEIGHT = 1000;
 const int SPRITE = 40;
 const int FPS = 60;
@@ -21,14 +21,17 @@ SDL_Surface* screenSurface = NULL;
 SDL_Renderer* render=NULL;
 SDL_Texture* wall=NULL;
 SDL_Texture* arrow=NULL;
+SDL_Texture* lb=NULL;
 TTF_Font *font=NULL;
 vector<vector<bool>> maze;
 vector<Bomb> bombs;
 vector<bullet>bul;
 vector<Enemy> en;
 vector<Enemy> tokill;
-vector<int> ehit;
+vector<int> ehit, pl;
+vector<vector<vector<int>>>things(25, vector<vector<int>>(25));
 int frame=0;
 int eid=0;
 int schedule=-1;
 Mix_Music *bgm;
+Mix_Chunk *bombsound, *bowsound;

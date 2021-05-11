@@ -18,14 +18,16 @@ bool init() {
 	}
 	else
 	{
-		if (SDL_Init(SDL_INIT_AUDIO) < 0){
+		if (SDL_Init(SDL_INIT_AUDIO) < 0) {
 			exit(1);
 		}
 		Mix_Init(0);
-		Mix_OpenAudio(22050,AUDIO_S16SYS,2,640);
+		Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 640);
 		TTF_Init();
-		bgm=Mix_LoadMUS("Audio/bgm.mp3");
-		window = SDL_CreateWindow("Darkest Curse of the Dead Cells", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE);
+		bgm = Mix_LoadMUS("Audio/bgm.mp3");
+		bombsound = Mix_LoadWAV("Audio/bomb.wav");
+		bowsound = Mix_LoadWAV("Audio/bow.wav");
+		window = SDL_CreateWindow("Darkest Curse of the Dead Cells", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 		if (window == NULL)
 		{
 			printf("Window died: %s\n", SDL_GetError());
@@ -46,9 +48,49 @@ bool init() {
 				}
 				else {
 					maze = MazeGenerate();
-					SDL_SetRenderDrawColor(render, 0xFF, 0xFF, 0xFF, 0xFF);
+					SDL_SetRenderDrawColor(render, 0, 0, 0, 0);
 					screenSurface = SDL_GetWindowSurface(window);
 					font = TTF_OpenFont("Fonts/Raleway-Black.ttf", 20);
+					if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
+                                        {
+                                                perror("socket failed");
+                                                exit(EXIT_FAILURE);
+                                        }
+                                        if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
+                                        {
+                                                perror("setsockopt");
+                                                exit(EXIT_FAILURE);
+                                        }
+                                        address.sin_family = AF_INET;
+                                        address.sin_addr.s_addr = INADDR_ANY;
+                                        address.sin_port = htons( PORT );
+                                        if (bind(server_fd, (struct sockaddr *)&address, sizeof(address))<0)
+                                        {
+                                                perror("bind failed");
+                                                exit(EXIT_FAILURE);
+                                        }
+                                        if (listen(server_fd, 3) < 0)
+                                        {
+                                                perror("listen");
+                                                exit(EXIT_FAILURE);
+                                        }
+                                        if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0)
+                                        {
+                                                perror("accept");
+                                                exit(EXIT_FAILURE);
+                                        }
+                                        string t="";
+                                        for(int i=0;i<25;++i){
+                                                for (int j=0;j<25;++j){
+                                                        if (maze[i][j]==0){
+                                                                t+="0";
+                                                        } else {
+                                                                t+="1";
+                                                        }
+                                                }
+                                        }
+                                        char const *s=t.c_str();
+                                        send(new_socket,s,1024,0);
 				}
 			}
 		}
@@ -103,21 +145,24 @@ int main(int argc, char* args[]) {
 			bool quit = false;
 			SDL_Event e;
 			SDL_RenderClear(render);
-			vector<pair<int, int>> loc = randspawn(40, 40, 920, 920);
+			vector<pair<int, int>> loc = randspawn(40,40, 920,920);
 			for (auto i : loc) {
 				eid++;
 				en.push_back(Enemy(eid, loadTexture(loadPNG("Textures/enemy.png")), i));
 			}
-			Player p1 = Player(loadTexture(loadPNG("Textures/p1.png")), 40, 40);
-			Player p2 = Player(loadTexture(loadPNG("Textures/p2.png")), 920, 920);
+			Player p1 = Player(loadTexture(loadPNG("Textures/p1.png")), 40,40);
+			Player p2 = Player(loadTexture(loadPNG("Textures/p2.png")), 920,920);
 			SDL_Texture* bombidle = loadTexture(loadPNG("Textures/bomb.png"));
 			SDL_Texture* bombexp = loadTexture(loadPNG("Textures/bombexpnew.png"));
 			arrow = loadTexture(loadPNG("Textures/arrow-scaled.png"));
 			wall = loadTexture(loadPNG("Textures/wall.png"));
-			int timer1=-1; int timer2=-1;
-			Mix_PlayMusic(bgm,1);
+			lb = loadTexture(loadPNG("Textures/lootbox.png"));
+			int timer1 = -1; int timer2 = -1;
+			Mix_PlayMusic(bgm, 1);
 			while (!quit) {
 				SDL_RenderCopy(render, gexp, NULL, NULL);
+				SDL_Rect out = { 1000,0,200,1000 };
+				SDL_RenderFillRect(render, &out);
 				for (int i = 0; i < maze.size(); i++) {
 					for (int j = 0; j < maze.size(); j++) {
 						if (!maze[i][j]) {
@@ -152,9 +197,9 @@ int main(int argc, char* args[]) {
 				int g1 = p1.x / 40, g2 = p2.x / 40, h1 = (p1.y + 39) / 40, h2 = (p2.y + 39) / 40;
 				for (auto i : en)
 				{
-					int k1 = i.locations.first / 40, k2 =( i.locations.second + 39)/ 40;
-					if (abs(k1-g1)+abs(k2-h1)==1) danger1 = true;
-					if (abs(k1-g2)+abs(k2-h2)==1) danger2 = true;
+					int k1 = i.locations.first / 40, k2 = (i.locations.second + 39) / 40;
+					if (abs(k1 - g1) + abs(k2 - h1) == 1) danger1 = true;
+					if (abs(k1 - g2) + abs(k2 - h2) == 1) danger2 = true;
 				}
 				if (danger1)
 				{
@@ -178,7 +223,7 @@ int main(int argc, char* args[]) {
 					if (p1.choose == 0) {
 						if (p1.curr == 0) {
 							if (!CollisionP1P2(p1.x, p1.y - 20, p2.x, p2.y))
-							p1.y = p1.y - SPRITE / 2; p1.moving = 1;
+								p1.y = p1.y - SPRITE / 2; p1.moving = 1;
 						}
 						else {
 							p1.curr = 0;
@@ -210,7 +255,7 @@ int main(int argc, char* args[]) {
 				else if (keystate[SDL_SCANCODE_RIGHT]) {
 					if (p1.choose == 0) {
 						if (p1.curr == 3) {
-							if(!CollisionP1P2(p1.x+20, p1.y, p2.x, p2.y))
+							if (!CollisionP1P2(p1.x + 20, p1.y, p2.x, p2.y))
 								p1.x = p1.x + SPRITE / 2; p1.moving = 1;
 						}
 						else {
@@ -219,115 +264,106 @@ int main(int argc, char* args[]) {
 					}
 				}
 				else if (keystate[SDL_SCANCODE_SPACE]) {
-					if (p1.choose == 0) {
-						timer1=5;
+					if (p1.carrow > 0 && p1.choose == 0) {
+						Mix_PlayChannel(-1, bowsound, 0);
+						p1.carrow--;
+						timer1 = 5;
 						p1.choose = 1;
 					}
 				}
 				else if (keystate[SDL_SCANCODE_L]) {
-					if (p1.choose == 0) {
-						bombs.push_back(Bomb(p1.x, p1.y, p1.curr, maze, bombidle, bombexp));
+					if (p1.cbomb > 0 && p1.choose == 0) {
+						p1.cbomb--;
+						bombs.push_back(Bomb(p1.x, p1.y, p1.curr, maze, 1, bombidle, bombexp));
 						p1.choose = 2;
 					}
 				}
-				if (keystate[SDL_SCANCODE_W]) {
-					if (p2.choose == 0) {
-						if (p2.curr == 0) {
-							if (!CollisionP1P2(p1.x, p1.y, p2.x, p2.y - 20))
-								p2.y = p2.y - SPRITE / 2; p2.moving = 1;
-						}
-						else {
-							p2.curr = 0;
-						}
-					}
-				}
-				else if (keystate[SDL_SCANCODE_S]) {
-					if (p2.choose == 0) {
-						if (p2.curr == 2) {
-							if (!CollisionP1P2(p1.x, p1.y, p2.x, p2.y + 20))
-								p2.y = p2.y + SPRITE / 2; p2.moving = 1;
-						}
-						else {
-							p2.curr = 2;
-						}
-					}
-				}
-				else if (keystate[SDL_SCANCODE_A]) {
-					if (p2.choose == 0) {
-						if (p2.curr == 1) {
-							if (!CollisionP1P2(p1.x, p1.y, p2.x - 20, p2.y))
-								p2.x = p2.x - SPRITE / 2; p2.moving = 1;
-						}
-						else {
-							p2.curr = 1;
-						}
-					}
-				}
-				else if (keystate[SDL_SCANCODE_D]) {
-					if (p2.choose == 0) {
-						if (p2.curr == 3) {
-							if (!CollisionP1P2(p1.x, p1.y, p2.x + 20, p2.y))
-								p2.x = p2.x + SPRITE / 2; p2.moving = 1;
-						}
-						else {
-							p2.curr = 3;
-						}
-					}
-				}
-				else if (keystate[SDL_SCANCODE_Q]) {
-					if (p2.choose == 0) {
-						timer2=5;
-						p2.choose = 1;
-					}
-				}
-				else if (keystate[SDL_SCANCODE_E]) {
-					if (p2.choose == 0) {
-						bombs.push_back(Bomb(p2.x, p2.y, p2.curr, maze, bombidle, bombexp));
-						p2.choose = 2;
-					}
-				}
+				int j1 = p1.x / 40, j2 = (p1.y + 39) / 40;
+				for(auto cc:things[j1][j2])
+				if (cc == 1) p1.carrow++;
+				else if (cc == 2) p1.HP += 20;
+				else if (cc == 3) p1.cbomb++;
+				else if (cc == 4) p1.score += 5;
+				//cout <<1<<' '<< p1.score << ' ' << p1.carrow << ' ' << p1.cbomb << ' ' << p1.HP << '\n';
+				things[j1][j2].clear();
+				j1 = p2.x / 40; j2 = (p2.y + 39) / 40;
+				for(auto cc:things[j1][j2])
+				if (cc == 1) p2.carrow++;
+				else if (cc == 2) p2.HP += 20;
+				else if (cc == 3) p2.cbomb++;
+				else if (cc == 4) p2.score += 5;
+				things[j1][j2].clear();
+				p1.HP = min(p1.HP, 100);
+				p2.HP = min(p2.HP, 100);
+				//cout << 2<<' '<<p2.score << ' ' << p2.carrow << ' ' << p2.cbomb << ' ' << p2.HP << '\n';
+
+
 				while (SDL_PollEvent(&e)) {
 					if (e.type == SDL_QUIT) {
 						quit = true;
 					}
 				}
-				if (timer1>0){
-                                                timer1--;
-                                        } else if (timer1==0){
-                                                bul.push_back(bullet(arrow, p1.curr, p1.x, p1.y, 1));
-                                                timer1--;
-                                        }
-				if (timer2>0){
-                                                timer2--;
-                                        } else if (timer2==0){
-                                                bul.push_back(bullet(arrow, p2.curr, p2.x, p2.y, 2));
-                                                timer2--;
-                                        }
 				if (CollisionMaze(p1.x, p1.y, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE, maze, loc)) {
-					p1.x = store[0];
-					p1.y = store[1];
-					p1.moving = 0;
+                                        p1.x = store[0];
+                                        p1.y = store[1];
+                                        p1.moving = 0;
+                                }
+				if (timer1 > 0) {
+					timer1--;
 				}
-				if (CollisionMaze(p2.x, p2.y, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE, maze, loc)) {
-					p2.x = store[2];
-					p2.y = store[3];
-					p2.moving = 0;
+				else if (timer1 == 0) {
+					bul.push_back(bullet(arrow, p1.curr, p1.x, p1.y, 1));
+					timer1--;
 				}
+				if (timer2 > 0) {
+					timer2--;
+				}
+				else if (timer2 == 0) {
+					bul.push_back(bullet(arrow, p2.curr, p2.x, p2.y, 2));
+					timer2--;
+				}
+				valread=read(new_socket,buffer,1024);
+                                string s=to_string(p1.x)+","+to_string(p1.y)+";";
+                                char const *t=s.c_str();
+                                send(new_socket,t,1024,0);
+                                string p2x,p2y;
+                                bool sw=0;
+                                for(int i=0;i<1024;++i){
+                                        if (buffer[i]==','){
+                                                sw=1;
+                                        } else if (buffer[i]==';'){
+                                                break;
+                                        } else if (sw==0){
+                                                p2x+=buffer[i];
+                                        } else {
+                                                p2y+=buffer[i];
+                                        }
+                                }
+                                p2.x=stoi(p2x); p2.y=stoi(p2y);
 				vector<pair<int, int>> etemp = move(p1.y, p1.x, p2.y, p2.x, loc);
 				for (int i = 0; i < bombs.size(); ++i) {
 					bombs[i].Tick();
 					bombs[i].RenderBomb(render);
 					vector<int>ehitt = bombs[i].check(&p1, &p2, en);
 					for (auto j : ehitt)
-						ehit.push_back(j);
+					{
+						if (find(ehit.begin(), ehit.end(), j) == ehit.end())
+						{
+							ehit.push_back(j);
+							pl.push_back(bombs[i].id);
+						}
+					}
 				}
-				for (int i=0;i<etemp.size();++i){
-					en[i].locations=etemp[i];
+				for (int i = 0; i < etemp.size(); ++i) {
+					en[i].locations = etemp[i];
 				}
 				vector<Bomb> temp;
-				for (auto i : bombs) {
-					if (i.spawntimer != 0) {
-						temp.push_back(i);
+				for (int i = 0; i < bombs.size(); ++i) {
+					if (bombs[i].spawntimer == 8) {
+						Mix_PlayChannel(-1, bombsound, 0);
+					}
+					if (bombs[i].spawntimer != 0) {
+						temp.push_back(bombs[i]);
 					}
 				}
 				bombs = temp;
@@ -335,63 +371,90 @@ int main(int argc, char* args[]) {
 				for (int i = 0; i < bul.size(); ++i)
 				{
 					int ehitt = bul[i].mvblt(en, p1.x, p1.y, p2.x, p2.y, p1.HP, p2.HP);
-					if(ehitt!=-1) ehit.push_back(ehitt);
+					if (ehitt != -1 && find(ehit.begin(), ehit.end(), ehitt) == ehit.end())
+					{
+						ehit.push_back(ehitt);
+						pl.push_back(bul[i].id);
+					}
 					if (bul[i].status == 1) bul1.push_back(bul[i]);
 				}
 				bul = bul1;
-				for (auto i:bul){
+				for (auto i : bul) {
 					i.RenderBullet(render);
 				}
 				vector<pair<int, int>> tloc;
 				vector<Enemy> ten;
 				for (int i = 0; i < etemp.size(); ++i) {
-					if (find(ehit.begin(), ehit.end(), en[i].id) == ehit.end()) {
+					auto it = find(ehit.begin(), ehit.end(), en[i].id);
+					if (it == ehit.end()) {
 						int curr = finddir(loc[i], etemp[i]);
 						en[i].dir = curr;
 						en[i].locations = etemp[i];
 						en[i].RenderEnemy(etemp[i].first, etemp[i].second, render);
 						ten.push_back(en[i]);
 						tloc.push_back(etemp[i]);
-					} else {
+					}
+					else
+					{
+						if (pl[it - ehit.begin()] == 1) ++p1.score;
+						else ++p2.score;
+						int surprise = gift();
+						things[etemp[i].first / 40][(etemp[i].second + 39) / 40].push_back(surprise);
 						tokill.push_back(en[i]);
 					}
 				}
 				if (ehit.size()) {
-					schedule += 20;
+					schedule += 20;   //changes
 				}
 				en = ten;
 				loc = tloc;
 				ten.clear();
-				for (int i = 0;i<tokill.size();++i){
-					if (!tokill[i].triggerDeath(render)){
+				for (int i = 0; i < tokill.size(); ++i) {
+					if (!tokill[i].triggerDeath(render)) {
 						ten.push_back(tokill[i]);
 					}
 				}
-				tokill=ten;
-				if (p1.HP <= 0 && p2.HP <= 0) {
-					cout << "Mutual Destruction\n";
+				tokill = ten;
+				p1.HP = max(p1.HP, 0);
+				p2.HP = max(p2.HP, 0);
+				if (p1.HP > 0 && p2.HP <= 0)
+				{
+					cout << "Player 1 Wins!!";
 					quit = true;
 				}
-				else if (p1.HP <= 0) {
-					cout << "Player 2 won\n";
+				else if (p2.HP > 0 && p1.HP <= 0)
+				{
+					cout << "Player 2 Wins!!";
 					quit = true;
 				}
-				else if (p2.HP <= 0) {
-					cout << "Player 1 won\n";
+				else if (p1.HP <= 0 && p2.HP <= 0)
+				{
+					if (p1.score > p2.score) cout << "Player 1 Wins";
+					else if (p2.score > p1.score) cout << "Player 2 Wins";
+					else cout << "Mutual Destruction";
 					quit = true;
+				}
+				for (int i = 0; i < 25; ++i) {
+					for (int j = 0; j < 25; ++j) {
+						if (things[i][j].size() != 0) {
+							RenderBox(lb, render, i, j);
+						}
+					}
 				}
 				p1.RenderPlayer(render, SDL_Rect{ p1.x,p1.y,SPRITE,SPRITE });
 				p2.RenderPlayer(render, SDL_Rect{ p2.x,p2.y,SPRITE,SPRITE });
-				RenderFont(render, font, p1.x, p1.y - 10, max(p1.HP,0));
-				RenderFont(render, font, p2.x, p2.y - 10, max(p2.HP,0));
+				RenderFont(render, font, p1.x, p1.y - 10, p1.HP);
+				RenderFont(render, font, p2.x, p2.y - 10, p2.HP);
 				for (auto i : en) {
 					RenderFont(render, font, i.locations.first, i.locations.second - 10, i.HP);
 				}
+				RenderData(p1, p2, render, font);
 				SDL_RenderPresent(render);
 				SDL_RenderClear(render);
 				p1.moving = 0; p2.moving = 0;
 				SDL_Delay(1000 / 12);
 				ehit.clear();
+				pl.clear();
 			}
 		}
 	}
