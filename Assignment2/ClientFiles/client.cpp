@@ -78,6 +78,7 @@ bool init() {
 			}
 		}
 	}
+	BFS(cell);
 	return success;
 }
 
