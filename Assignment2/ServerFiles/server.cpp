@@ -270,67 +270,16 @@ int main(int argc, char* args[]) {
 						p1.choose = 2;
 					}
 				}
-				if (keystate[SDL_SCANCODE_W]) {
-					if (p2.choose == 0) {
-						if (p2.curr == 0) {
-							if (!CollisionP1P2(p1.x, p1.y, p2.x, p2.y - 20))
-								p2.y = p2.y - SPRITE / 2; p2.moving = 1;
-						}
-						else {
-							p2.curr = 0;
-						}
-					}
-				}
-				else if (keystate[SDL_SCANCODE_S]) {
-					if (p2.choose == 0) {
-						if (p2.curr == 2) {
-							if (!CollisionP1P2(p1.x, p1.y, p2.x, p2.y + 20))
-								p2.y = p2.y + SPRITE / 2; p2.moving = 1;
-						}
-						else {
-							p2.curr = 2;
-						}
-					}
-				}
-				else if (keystate[SDL_SCANCODE_A]) {
-					if (p2.choose == 0) {
-						if (p2.curr == 1) {
-							if (!CollisionP1P2(p1.x, p1.y, p2.x - 20, p2.y))
-								p2.x = p2.x - SPRITE / 2; p2.moving = 1;
-						}
-						else {
-							p2.curr = 1;
-						}
-					}
-				}
-				else if (keystate[SDL_SCANCODE_D]) {
-					if (p2.choose == 0) {
-						if (p2.curr == 3) {
-							if (!CollisionP1P2(p1.x, p1.y, p2.x + 20, p2.y))
-								p2.x = p2.x + SPRITE / 2; p2.moving = 1;
-						}
-						else {
-							p2.curr = 3;
-						}
-					}
-				}
-				else if (keystate[SDL_SCANCODE_Q]) {
-					if (p2.choose == 0) {
-						timer2=5;
-						p2.choose = 1;
-					}
-				}
-				else if (keystate[SDL_SCANCODE_E]) {
-					if (p2.choose == 0) {
-						bombs.push_back(Bomb(p2.x, p2.y, p2.curr, maze, bombidle, bombexp));
-						p2.choose = 2;
-					}
-				}
 				while (SDL_PollEvent(&e)) {
 					if (e.type == SDL_QUIT) {
 						quit = true;
 					}
 				}
+				if (CollisionMaze(p1.x, p1.y, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE, maze, loc)) {
+                                        p1.x = store[0];
+                                        p1.y = store[1];
+                                        p1.moving = 0;
+                                }
 				if (timer1>0){
                                                 timer1--;
                                         } else if (timer1==0){
@@ -343,16 +292,24 @@ int main(int argc, char* args[]) {
                                                 bul.push_back(bullet(arrow, p2.curr, p2.x, p2.y, 2));
                                                 timer2--;
                                         }
-				if (CollisionMaze(p1.x, p1.y, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE, maze, loc)) {
-					p1.x = store[0];
-					p1.y = store[1];
-					p1.moving = 0;
-				}
-				if (CollisionMaze(p2.x, p2.y, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE, maze, loc)) {
-					p2.x = store[2];
-					p2.y = store[3];
-					p2.moving = 0;
-				}
+				valread=read(new_socket,buffer,1024);
+				string s=to_string(p1.x)+","+to_string(p1.y)+";";
+                                char const *t=s.c_str();
+                                send(new_socket,t,1024,0);
+				string p2x,p2y;
+                                bool sw=0;
+                                for(int i=0;i<1024;++i){
+                                        if (buffer[i]==','){
+                                                sw=1;
+                                        } else if (buffer[i]==';'){
+                                                break;
+                                        } else if (sw==0){
+                                                p2x+=buffer[i];
+                                        } else {
+                                                p2y+=buffer[i];
+                                        }
+                                }
+                                p2.x=stoi(p2x); p2.y=stoi(p2y);
 				vector<pair<int, int>> etemp = move(p1.y, p1.x, p2.y, p2.x, loc);
 				for (int i = 0; i < bombs.size(); ++i) {
 					bombs[i].Tick();

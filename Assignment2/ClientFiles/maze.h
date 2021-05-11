@@ -30,8 +30,13 @@ void join(int a, int b)
 	cell[r][c] = 1;
 }
 
-void BFS(vector<vector<int>>cell)
+void BFS(vector<vector<bool>>q)
 {
+	for(int i=0;i<25;++i){
+		for(int j=0;j<25;++j){
+			cell[i][j]=q[i][j];
+		}
+	}
 	for (int i = 0; i < 25; ++i)
 	{
 		for (int j = i + 1; j < 25; ++j)
@@ -83,6 +88,11 @@ void BFS(vector<vector<int>>cell)
 			}
 		}
 	}
+	for (int i = 0; i < 25; ++i)
+        {
+                for (int j = i + 1; j < 25; ++j)
+                        swap(cell[i][j], cell[j][i]);
+        }
 }
 
 void Maze()

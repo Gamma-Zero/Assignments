@@ -78,7 +78,7 @@ bool init() {
 			}
 		}
 	}
-	BFS(cell);
+	BFS(maze);
 	return success;
 }
 
@@ -129,12 +129,6 @@ int main(int argc, char* args[]) {
 			bool quit = false;
 			SDL_Event e;
 			SDL_RenderClear(render);
-			for(auto i:maze){
-				for (auto j:i){
-					cout << j << " ";
-				}
-				cout << '\n';
-			}
 			vector<pair<int, int>> loc = randspawn(40, 40, 920, 920);
 			for (auto i : loc) {
 				eid++;
@@ -206,62 +200,6 @@ int main(int argc, char* args[]) {
 				}
 				if (p1.rest > 0) --p1.rest;
 				if (p2.rest > 0) --p2.rest;
-				if (keystate[SDL_SCANCODE_UP]) {
-					if (p1.choose == 0) {
-						if (p1.curr == 0) {
-							if (!CollisionP1P2(p1.x, p1.y - 20, p2.x, p2.y))
-							p1.y = p1.y - SPRITE / 2; p1.moving = 1;
-						}
-						else {
-							p1.curr = 0;
-						}
-					}
-				}
-				else if (keystate[SDL_SCANCODE_DOWN]) {
-					if (p1.choose == 0) {
-						if (p1.curr == 2) {
-							if (!CollisionP1P2(p1.x, p1.y + 20, p2.x, p2.y))
-								p1.y = p1.y + SPRITE / 2; p1.moving = 1;
-						}
-						else {
-							p1.curr = 2;
-						}
-					}
-				}
-				else if (keystate[SDL_SCANCODE_LEFT]) {
-					if (p1.choose == 0) {
-						if (p1.curr == 1) {
-							if (!CollisionP1P2(p1.x - 20, p1.y, p2.x, p2.y))
-								p1.x = p1.x - SPRITE / 2; p1.moving = 1;
-						}
-						else {
-							p1.curr = 1;
-						}
-					}
-				}
-				else if (keystate[SDL_SCANCODE_RIGHT]) {
-					if (p1.choose == 0) {
-						if (p1.curr == 3) {
-							if(!CollisionP1P2(p1.x+20, p1.y, p2.x, p2.y))
-								p1.x = p1.x + SPRITE / 2; p1.moving = 1;
-						}
-						else {
-							p1.curr = 3;
-						}
-					}
-				}
-				else if (keystate[SDL_SCANCODE_SPACE]) {
-					if (p1.choose == 0) {
-						timer1=5;
-						p1.choose = 1;
-					}
-				}
-				else if (keystate[SDL_SCANCODE_L]) {
-					if (p1.choose == 0) {
-						bombs.push_back(Bomb(p1.x, p1.y, p1.curr, maze, bombidle, bombexp));
-						p1.choose = 2;
-					}
-				}
 				if (keystate[SDL_SCANCODE_W]) {
 					if (p2.choose == 0) {
 						if (p2.curr == 0) {
@@ -323,6 +261,11 @@ int main(int argc, char* args[]) {
 						quit = true;
 					}
 				}
+				if (CollisionMaze(p2.x, p2.y, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE, maze, loc)) {
+                                        p2.x = store[2];
+                                        p2.y = store[3];
+                                        p2.moving = 0;
+                                }
 				if (timer1>0){
                                                 timer1--;
                                         } else if (timer1==0){
@@ -335,16 +278,25 @@ int main(int argc, char* args[]) {
                                                 bul.push_back(bullet(arrow, p2.curr, p2.x, p2.y, 2));
                                                 timer2--;
                                         }
-				if (CollisionMaze(p1.x, p1.y, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE, maze, loc)) {
-					p1.x = store[0];
-					p1.y = store[1];
-					p1.moving = 0;
+				string s=to_string(p2.x)+","+to_string(p2.y)+";";
+				char const *t=s.c_str();
+				send(sock,t,1024,0);
+				valread=read(sock,buffer,1024);
+				string p1x,p1y;
+				bool sw=0;
+				for(int i=0;i<1024;++i){
+					if (buffer[i]==','){
+						sw=1;
+					} else if (buffer[i]==';'){
+						break;
+					} else if (sw==0){
+						p1x+=buffer[i];
+					} else {
+						p1y+=buffer[i];
+					}
 				}
-				if (CollisionMaze(p2.x, p2.y, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE, maze, loc)) {
-					p2.x = store[2];
-					p2.y = store[3];
-					p2.moving = 0;
-				}
+				p1.x=stoi(p1x); p1.y=stoi(p1y);
+				cout << p1.x << " " << p1.y << '\n';
 				vector<pair<int, int>> etemp = move(p1.y, p1.x, p2.y, p2.x, loc);
 				for (int i = 0; i < bombs.size(); ++i) {
 					bombs[i].Tick();
