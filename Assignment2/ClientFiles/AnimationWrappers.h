@@ -132,11 +132,11 @@ struct Enemy {
 		walkanimation = Anim(0, 10 * ssheeth / 21, ssheetw / 13, ssheeth / 21);
 		deathanimation = Anim(0, 20 * ssheeth / 21, ssheetw / 13, ssheeth / 21);
 		locations = loc;
-		dir = -1;
+		dir = 9;
 		id = i;
 	}
 	void RenderEnemy(int x1, int y1, SDL_Renderer* render) {
-		if (dir==-1){
+		if (dir==9){
 			walkanimation.x=0;
 		} else {
 			walkanimation.x = (walkanimation.x + ssheetw / 13) % (9 * ssheetw / 13);
@@ -175,7 +175,7 @@ int finddir(pair<int, int> s, pair<int, int> e) {
         else if (e.second > s.second) {
                 return 2;
         } else {
-		return -1;
+		return 9;
 	}
 }
 

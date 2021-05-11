@@ -2,7 +2,7 @@
 using namespace std;
 vector<int> parse(string s){    // player(9 char, x+y+dir+ismove+anim);enemy(12 char, x+y+dir+id);bomb(1 char);arrow(1 char)
     int index=12;
-    string s1=s.substr(0,4), s2=s.substr(4,4), s3=s.substr(8,1),s4=s[9], s5=s[10];
+    string s1=s.substr(0,4), s2=s.substr(4,4), s3=s.substr(8,1),s4=s.substr(9,1), s5=s.substr(10,1);
     stringstream p1(s1), p2(s2), p3(s3), p4(s4), p5(s5);
     int w1,w2,w3,w4,w5;
     p1>>w1;

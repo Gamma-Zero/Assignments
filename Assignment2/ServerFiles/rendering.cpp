@@ -3,6 +3,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
 #include <bits/stdc++.h>
+#include "parse.h"
 #include "projectiles.h"
 #include "Global.h"
 #include "font.h"
@@ -150,6 +151,29 @@ int main(int argc, char* args[]) {
 				eid++;
 				en.push_back(Enemy(eid, loadTexture(loadPNG("Textures/enemy.png")), i));
 			}
+			string s="00400040000;";
+			for (auto i:en){
+				string temp=to_string(i.locations.first);
+				for (int i=0;i<(4-temp.size());++i){
+					s+="0";
+				}
+				s+=temp;
+				temp=to_string(i.locations.second);
+                                for (int i=0;i<(4-temp.size());++i){
+                                        s+="0";
+                                }
+                                s+=temp;
+				s+=to_string(i.dir);
+				temp=to_string(i.id);
+				for (int i=0;i<(3-temp.size());++i){
+                                        s+="0";
+                                }
+				s+=temp;
+			}
+			s+=";0;0";
+			cout << s << '\n';
+			const char *t=s.c_str();
+			send(new_socket,t,1024,0);
 			Player p1 = Player(loadTexture(loadPNG("Textures/p1.png")), 40,40);
 			Player p2 = Player(loadTexture(loadPNG("Textures/p2.png")), 920,920);
 			SDL_Texture* bombidle = loadTexture(loadPNG("Textures/bomb.png"));
@@ -159,6 +183,7 @@ int main(int argc, char* args[]) {
 			lb = loadTexture(loadPNG("Textures/lootbox.png"));
 			int timer1 = -1; int timer2 = -1;
 			Mix_PlayMusic(bgm, 1);
+			bool bombt=0; bool bult=0;
 			while (!quit) {
 				SDL_RenderCopy(render, gexp, NULL, NULL);
 				SDL_Rect out = { 1000,0,200,1000 };
@@ -269,6 +294,7 @@ int main(int argc, char* args[]) {
 						p1.carrow--;
 						timer1 = 5;
 						p1.choose = 1;
+						bult=1;
 					}
 				}
 				else if (keystate[SDL_SCANCODE_L]) {
@@ -276,6 +302,7 @@ int main(int argc, char* args[]) {
 						p1.cbomb--;
 						bombs.push_back(Bomb(p1.x, p1.y, p1.curr, maze, 1, bombidle, bombexp));
 						p1.choose = 2;
+						bombt=1;
 					}
 				}
 				int j1 = p1.x / 40, j2 = (p1.y + 39) / 40;
@@ -323,23 +350,38 @@ int main(int argc, char* args[]) {
 					timer2--;
 				}
 				valread=read(new_socket,buffer,1024);
-                                string s=to_string(p1.x)+","+to_string(p1.y)+";";
+				vector<int> tt=parse((string)buffer);
+				p2.x=tt[0]; p2.y=tt[1]; p2.curr=tt[2]; p2.moving=tt[3]; p2.choose=tt[4];
+				if (tt[5]){
+					p2.cbomb--;
+                                                bombs.push_back(Bomb(p2.x, p2.y, p2.curr, maze, 2, bombidle, bombexp));
+                                                p2.choose = 2;
+				}
+				if (tt[6]){
+					Mix_PlayChannel(-1, bowsound, 0);
+                                        p2.carrow--;
+                                        timer2 = 5;
+                                        p2.choose = 1;
+				}
+				string s="";
+                                string stemp=to_string(p1.x);
+                                for (int i=0;i<(4-stemp.size());++i){
+                                        s+="0";
+                                }
+                                s+=stemp;
+                                stemp=to_string(p1.y);
+                                for (int i=0;i<(4-stemp.size());++i){
+                                        s+="0";
+                                }
+                                s+=stemp;
+                                s+=to_string(p1.curr);
+                                s+=to_string(p1.moving);
+                                s+=to_string(p1.choose);
+                                s+=";"; s+=";";
+                                if (bombt) s+="1"; else s+="0"; s+=";";
+                                if (bult) s+="1"; else s+="0";
                                 char const *t=s.c_str();
                                 send(new_socket,t,1024,0);
-                                string p2x,p2y;
-                                bool sw=0;
-                                for(int i=0;i<1024;++i){
-                                        if (buffer[i]==','){
-                                                sw=1;
-                                        } else if (buffer[i]==';'){
-                                                break;
-                                        } else if (sw==0){
-                                                p2x+=buffer[i];
-                                        } else {
-                                                p2y+=buffer[i];
-                                        }
-                                }
-                                p2.x=stoi(p2x); p2.y=stoi(p2y);
 				vector<pair<int, int>> etemp = move(p1.y, p1.x, p2.y, p2.x, loc);
 				for (int i = 0; i < bombs.size(); ++i) {
 					bombs[i].Tick();
@@ -454,7 +496,7 @@ int main(int argc, char* args[]) {
 				p1.moving = 0; p2.moving = 0;
 				SDL_Delay(1000 / 12);
 				ehit.clear();
-				pl.clear();
+				pl.clear(); bult=0; bombt=0;
 			}
 		}
 	}
