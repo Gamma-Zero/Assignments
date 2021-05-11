@@ -30,47 +30,56 @@ void join(int a, int b)
 	cell[r][c] = 1;
 }
 
-void BFS(int cur)
+void BFS(vector<vector<int>>cell)
 {
-	if (cell[cur / 25][cur % 25] == 0) return;
-	int r, c;
-	queue<int>q;
-	dis[cur][cur] = 0;
-	q.push(cur);
-	while (!q.empty())
+	for (int i = 0; i < 25; ++i)
 	{
-		int x = q.front(); q.pop();
-		r = x / 25; c = x % 25;
-		if (r < 24 && cell[r + 1][c] == 1)
+		for (int j = i + 1; j < 25; ++j)
+			swap(cell[i][j], cell[j][i]);
+	}
+	for (int i = 0; i < 625; ++i)
+	{
+		int cur = i;
+		if (cell[cur / 25][cur % 25] == 0) continue;
+		int r, c;
+		queue<int>q;
+		dis[cur][cur] = 0;
+		q.push(cur);
+		while (!q.empty())
 		{
-			if (dis[cur][r * 25 + c + 25] > dis[cur][x] + 1)
+			int x = q.front(); q.pop();
+			r = x / 25; c = x % 25;
+			if (r < 24 && cell[r + 1][c] == 1)
 			{
-				q.push(r * 25 + c + 25);
-				dis[cur][r * 25 + c + 25] = dis[cur][x] + 1;
+				if (dis[cur][r * 25 + c + 25] > dis[cur][x] + 1)
+				{
+					q.push(r * 25 + c + 25);
+					dis[cur][r * 25 + c + 25] = dis[cur][x] + 1;
+				}
 			}
-		}
-		if (r > 0 && cell[r - 1][c] == 1)
-		{
-			if (dis[cur][r * 25 + c - 25] > dis[cur][x] + 1)
+			if (r > 0 && cell[r - 1][c] == 1)
 			{
-				q.push(r * 25 + c - 25);
-				dis[cur][r * 25 + c - 25] = dis[cur][x] + 1;
+				if (dis[cur][r * 25 + c - 25] > dis[cur][x] + 1)
+				{
+					q.push(r * 25 + c - 25);
+					dis[cur][r * 25 + c - 25] = dis[cur][x] + 1;
+				}
 			}
-		}
-		if (c < 24 && cell[r][c + 1] == 1)
-		{
-			if (dis[cur][r * 25 + c + 1] > dis[cur][x] + 1)
+			if (c < 24 && cell[r][c + 1] == 1)
 			{
-				q.push(r * 25 + c + 1);
-				dis[cur][r * 25 + c + 1] = dis[cur][x] + 1;
+				if (dis[cur][r * 25 + c + 1] > dis[cur][x] + 1)
+				{
+					q.push(r * 25 + c + 1);
+					dis[cur][r * 25 + c + 1] = dis[cur][x] + 1;
+				}
 			}
-		}
-		if (c > 0 && cell[r][c - 1] == 1)
-		{
-			if (dis[cur][r * 25 + c - 1] > dis[cur][x] + 1)
+			if (c > 0 && cell[r][c - 1] == 1)
 			{
-				q.push(r * 25 + c - 1);
-				dis[cur][r * 25 + c - 1] = dis[cur][x] + 1;
+				if (dis[cur][r * 25 + c - 1] > dis[cur][x] + 1)
+				{
+					q.push(r * 25 + c - 1);
+					dis[cur][r * 25 + c - 1] = dis[cur][x] + 1;
+				}
 			}
 		}
 	}
@@ -107,7 +116,6 @@ void Maze()
 		edge = edge1;
 	}
 	for (int i = 0; i < 25; ++i) for (int j = 0; j < 25; ++j) if (cell[i][j]) frcell.push_back(25 * i + j);
-	for (int i = 0; i < 625; i++) BFS(i);
 }
 
 vector<vector<bool>> MazeGenerate()
