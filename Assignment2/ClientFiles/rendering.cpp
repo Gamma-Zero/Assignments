@@ -28,7 +28,7 @@ bool init() {
 		bgm = Mix_LoadMUS("Audio/bgm.mp3");
 		bombsound = Mix_LoadWAV("Audio/bomb.wav");
 		bowsound = Mix_LoadWAV("Audio/bow.wav");
-		window = SDL_CreateWindow("Darkest Curse of the Dead Cells", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+		window = SDL_CreateWindow("Darkest Curse of the Dead Cells", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE);
 		if (window == NULL)
 		{
 			printf("Window died: %s\n", SDL_GetError());
@@ -43,6 +43,8 @@ bool init() {
 			}
 			else {
 				render = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+				SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY,"linear");
+                                SDL_RenderSetLogicalSize(render,1200,1000);
 				if (render == NULL) {
 					printf("Renderer died\n");
 					success = false;
