@@ -54,6 +54,13 @@ bool init() {
 					SDL_SetRenderDrawColor(render, 0, 0, 0, 0);
 					screenSurface = SDL_GetWindowSurface(window);
 					font = TTF_OpenFont("Fonts/Raleway-Black.ttf", 20);
+					string idle="Waiting for client...";
+                                        SDL_Color fcolor={173,216,230};
+                                        SDL_Color bcolor={0,0,0};
+                                        SDL_Surface* temp=TTF_RenderText_Shaded(font,idle.c_str(),fcolor,bcolor);
+                                        SDL_Rect space={500,500,10*idle.size(),20};
+                                        SDL_BlitSurface(temp,NULL,screenSurface,&space);
+                                        SDL_UpdateWindowSurface(window);
 					if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
                                         {
                                                 perror("socket failed");
@@ -172,7 +179,7 @@ int main(int argc, char* args[]) {
                                 }
 				s+=temp;
 			}
-			s+=";0;0";
+			s+=";0;0;1000000510";
 			cout << s << '\n';
 			const char *t=s.c_str();
 			send(new_socket,t,1024,0);
@@ -316,12 +323,7 @@ int main(int argc, char* args[]) {
 				//cout <<1<<' '<< p1.score << ' ' << p1.carrow << ' ' << p1.cbomb << ' ' << p1.HP << '\n';
 				things[j1][j2].clear();
 				j1 = p2.x / 40; j2 = (p2.y + 39) / 40;
-				for(auto cc:things[j1][j2])
-				if (cc == 1) p2.carrow++;
-				else if (cc == 2) p2.HP += 20;
-				else if (cc == 3) p2.cbomb++;
-				else if (cc == 4) p2.score += 5;
-				things[j1][j2].clear();
+                                things[j1][j2].clear();
 				p1.HP = min(p1.HP, 100);
 				p2.HP = min(p2.HP, 100);
 				//cout << 2<<' '<<p2.score << ' ' << p2.carrow << ' ' << p2.cbomb << ' ' << p2.HP << '\n';
@@ -354,14 +356,13 @@ int main(int argc, char* args[]) {
 				valread=read(new_socket,buffer,1024);
 				vector<int> tt=parse((string)buffer);
 				p2.x=tt[0]; p2.y=tt[1]; p2.curr=tt[2]; p2.moving=tt[3]; p2.choose=tt[4];
-				if (tt[5]){
-					p2.cbomb--;
+				p2.carrow=tt[5]; p2.cbomb=tt[6]; p2.score=tt[7]; p2.HP=tt[8];
+				if (tt[9]){
                                                 bombs.push_back(Bomb(p2.x, p2.y, p2.curr, maze, 2, bombidle, bombexp));
                                                 p2.choose = 2;
 				}
-				if (tt[6]){
+				if (tt[10]){
 					Mix_PlayChannel(-1, bowsound, 0);
-                                        p2.carrow--;
                                         timer2 = 5;
                                         p2.choose = 1;
 				}
@@ -395,7 +396,27 @@ int main(int argc, char* args[]) {
 								}
 								s+=";";
                                 if (bombt) s+="1"; else s+="0"; s+=";";
-                                if (bult) s+="1"; else s+="0";
+                                if (bult) s+="1"; else s+="0"; s+=";";
+				stemp=to_string(p1.HP);
+                                for (int i=0;i<(3-stemp.size());++i){
+                                        s+="0";
+                                }
+                                s+=stemp; s+=";";
+				stemp=to_string(p1.score);
+                                for (int i=0;i<(3-stemp.size());++i){
+                                        s+="0";
+                                }
+                                s+=stemp; s+=";";
+				stemp=to_string(p1.cbomb);
+                                for (int i=0;i<(2-stemp.size());++i){
+                                        s+="0";
+                                }
+                                s+=stemp; s+=";";
+				stemp=to_string(p1.carrow);
+                                for (int i=0;i<(2-stemp.size());++i){
+                                        s+="0";
+                                }
+                                s+=stemp;
                                 char const *t=s.c_str();
                                 send(new_socket,t,1024,0);
 				vector<pair<int, int>> etemp = move(p1.y, p1.x, p2.y, p2.x, loc);

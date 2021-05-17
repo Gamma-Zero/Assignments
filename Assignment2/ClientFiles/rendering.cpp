@@ -137,7 +137,7 @@ int main(int argc, char* args[]) {
 			valread=read(sock,buffer,1024);
 			vector<int> tt=parse((string)buffer);
 			vector<pair<int,int>> loc;
-			for(int i=7;i<tt.size();i+=4){
+			for(int i=11;i<tt.size();i+=4){
 					loc.push_back({tt[i],tt[i+1]});
 					en.push_back(Enemy(tt[i+3], loadTexture(loadPNG("Textures/enemy.png")), {tt[i],tt[i+1]}));
 			}
@@ -256,11 +256,6 @@ int main(int argc, char* args[]) {
 					}
 				}
 				int j1 = p1.x / 40, j2 = (p1.y + 39) / 40;
-				for(auto cc:things[j1][j2])
-				if (cc == 1) p1.carrow++;
-				else if (cc == 2) p1.HP += 20;
-				else if (cc == 3) p1.cbomb++;
-				else if (cc == 4) p1.score += 5;
 				things[j1][j2].clear();
 				j1 = p2.x / 40; j2 = (p2.y + 39) / 40;
 				for(auto cc:things[j1][j2])
@@ -311,24 +306,43 @@ int main(int argc, char* args[]) {
 				s+=to_string(p2.choose);
 				s+=";"; s+=";";
 				if (bombt) s+="1"; else s+="0"; s+=";";
-				if (bult) s+="1"; else s+="0";
+				if (bult) s+="1"; else s+="0"; s+=";";
+				stemp=to_string(p2.HP);
+                                for (int i=0;i<(3-stemp.size());++i){
+                                        s+="0";
+                                }
+                                s+=stemp; s+=";";
+                                stemp=to_string(p2.score);
+                                for (int i=0;i<(3-stemp.size());++i){
+                                        s+="0";
+                                }
+                                s+=stemp; s+=";";
+                                stemp=to_string(p2.cbomb);
+                                for (int i=0;i<(2-stemp.size());++i){
+                                        s+="0";
+                                }
+                                s+=stemp; s+=";";
+                                stemp=to_string(p2.carrow);
+                                for (int i=0;i<(2-stemp.size());++i){
+                                        s+="0";
+                                }
+                                s+=stemp;
                                 char const *t=s.c_str();
                                 send(sock,t,1024,0);
                                 valread=read(sock,buffer,1024);
 				vector<int> tt=parse((string)buffer);
                                 p1.x=tt[0]; p1.y=tt[1]; p1.curr=tt[2]; p1.moving=tt[3]; p1.choose=tt[4];
-                                if (tt[5]){
-                                        p1.cbomb--;
+				p1.carrow=tt[5]; p1.cbomb=tt[6]; p1.score=tt[7]; p1.HP=tt[8];
+                                if (tt[9]){
                                                 bombs.push_back(Bomb(p1.x, p1.y, p1.curr, maze, 2, bombidle, bombexp));
                                                 p1.choose = 2;
                                 }
-                                if (tt[6]){
+                                if (tt[10]){
                                         Mix_PlayChannel(-1, bowsound, 0);
-                                        p1.carrow--;
                                         timer1 = 5;
                                         p1.choose = 1;
                                 }
-				for(int i=7;i<tt.size();i+=4){
+				for(int i=11;i<tt.size();i+=4){
 					bool f=0;
 					for (int j=0;j<en.size();++j){
 						if (en[j].id==tt[i+3]){
