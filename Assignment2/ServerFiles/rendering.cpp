@@ -379,7 +379,21 @@ int main(int argc, char* args[]) {
                                 s+=to_string(p1.curr);
                                 s+=to_string(p1.moving);
                                 s+=to_string(p1.choose);
-                                s+=";"; s+=";";
+                                s+=";"; 
+								for (int i = 0; i < (int)en.size(); ++i)
+								{
+									int v1= en[i].locations.first, v2=en[i].locations.second, v3=en[i].dir, v4=en[i].id ;
+									string ss1 = to_string(v1), ss2 = to_string(v2), ss3 = to_string(v3), ss4 = to_string(v4);
+									while ((int)ss1.size() < 4) ss1 = "0" + ss1;
+									while ((int)ss2.size() < 4) ss2 = "0" + ss2;
+									while ((int)ss4.size() < 3) ss4 = "0" + ss4;
+									cout << v1 << " " << v2 << " " << v3 << '\n';
+									s += ss1;
+									s += ss2;
+									s += ss3;
+									s += ss4;
+								}
+								s+=";";
                                 if (bombt) s+="1"; else s+="0"; s+=";";
                                 if (bult) s+="1"; else s+="0";
                                 char const *t=s.c_str();

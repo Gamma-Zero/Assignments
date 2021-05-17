@@ -76,12 +76,6 @@ bool init() {
                                                         maze[i/25].push_back(1);
                                                 }
                                         }
-					for(int i=0;i<25;++i){
-						for(int j=0;j<25;++j){
-							cout << maze[i][j];
-						}
-						cout << '\n';
-					}
 					SDL_SetRenderDrawColor(render, 0, 0, 0, 0);
 					screenSurface = SDL_GetWindowSurface(window);
 					font = TTF_OpenFont("Fonts/Raleway-Black.ttf", 20);
@@ -146,7 +140,6 @@ int main(int argc, char* args[]) {
 			for(int i=7;i<tt.size();i+=4){
 					loc.push_back({tt[i],tt[i+1]});
 					en.push_back(Enemy(tt[i+3], loadTexture(loadPNG("Textures/enemy.png")), {tt[i],tt[i+1]}));
-					cout << tt[i] << " " << tt[i+1] << '\n';
 			}
 			Player p1 = Player(loadTexture(loadPNG("Textures/p1.png")), 40,40);
 			Player p2 = Player(loadTexture(loadPNG("Textures/p2.png")), 920,920);
@@ -268,7 +261,6 @@ int main(int argc, char* args[]) {
 				else if (cc == 2) p1.HP += 20;
 				else if (cc == 3) p1.cbomb++;
 				else if (cc == 4) p1.score += 5;
-				//cout <<1<<' '<< p1.score << ' ' << p1.carrow << ' ' << p1.cbomb << ' ' << p1.HP << '\n';
 				things[j1][j2].clear();
 				j1 = p2.x / 40; j2 = (p2.y + 39) / 40;
 				for(auto cc:things[j1][j2])
@@ -279,7 +271,6 @@ int main(int argc, char* args[]) {
 				things[j1][j2].clear();
 				p1.HP = min(p1.HP, 100);
 				p2.HP = min(p2.HP, 100);
-				//cout << 2<<' '<<p2.score << ' ' << p2.carrow << ' ' << p2.cbomb << ' ' << p2.HP << '\n';
 				if (CollisionMaze(p2.x, p2.y, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE, maze, loc)) {
                                         p2.x = store[2];
                                         p2.y = store[3];
@@ -337,6 +328,22 @@ int main(int argc, char* args[]) {
                                         timer1 = 5;
                                         p1.choose = 1;
                                 }
+				for(int i=7;i<tt.size();i+=4){
+					cout << tt[i] << " " << tt[i+1] << " " << tt[i+3] << '\n';
+					bool f=0;
+					for (int i=0;i<en.size();++i){
+						if (en[i].id==tt[i+3]){
+							f=1;
+							en[i].locations={tt[i],tt[i+1]};
+							loc[i]={tt[i],tt[i+1]};
+							break;
+						}
+					}
+					if (!f){
+                                        	loc.push_back({tt[i],tt[i+1]});
+                                        	en.push_back(Enemy(tt[i+3], loadTexture(loadPNG("Textures/enemy.png")), {tt[i],tt[i+1]}));
+					}
+                        	} 
 				vector<pair<int, int>> etemp = move(p1.y, p1.x, p2.y, p2.x, loc);
 				for (int i = 0; i < bombs.size(); ++i) {
 					bombs[i].Tick();

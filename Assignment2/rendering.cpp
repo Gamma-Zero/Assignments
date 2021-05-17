@@ -1,8 +1,9 @@
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
-#include <SDL_mixer.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include <bits/stdc++.h>
+#include "parse.h"
 #include "projectiles.h"
 #include "Global.h"
 #include "font.h"
@@ -27,7 +28,7 @@ bool init() {
 		bgm = Mix_LoadMUS("Audio/bgm.mp3");
 		bombsound = Mix_LoadWAV("Audio/bomb.wav");
 		bowsound = Mix_LoadWAV("Audio/bow.wav");
-		window = SDL_CreateWindow("Darkest Curse of the Dead Cells", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+		window = SDL_CreateWindow("Darkest Curse of the Dead Cells", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE);
 		if (window == NULL)
 		{
 			printf("Window died: %s\n", SDL_GetError());
@@ -42,6 +43,8 @@ bool init() {
 			}
 			else {
 				render = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+				SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY,"linear");
+				SDL_RenderSetLogicalSize(render,1200,1000);
 				if (render == NULL) {
 					printf("Renderer died\n");
 					success = false;
@@ -51,6 +54,46 @@ bool init() {
 					SDL_SetRenderDrawColor(render, 0, 0, 0, 0);
 					screenSurface = SDL_GetWindowSurface(window);
 					font = TTF_OpenFont("Fonts/Raleway-Black.ttf", 20);
+					if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
+                                        {
+                                                perror("socket failed");
+                                                exit(EXIT_FAILURE);
+                                        }
+                                        if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
+                                        {
+                                                perror("setsockopt");
+                                                exit(EXIT_FAILURE);
+                                        }
+                                        address.sin_family = AF_INET;
+                                        address.sin_addr.s_addr = INADDR_ANY;
+                                        address.sin_port = htons( PORT );
+                                        if (bind(server_fd, (struct sockaddr *)&address, sizeof(address))<0)
+                                        {
+                                                perror("bind failed");
+                                                exit(EXIT_FAILURE);
+                                        }
+                                        if (listen(server_fd, 3) < 0)
+                                        {
+                                                perror("listen");
+                                                exit(EXIT_FAILURE);
+                                        }
+                                        if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0)
+                                        {
+                                                perror("accept");
+                                                exit(EXIT_FAILURE);
+                                        }
+                                        string t="";
+                                        for(int i=0;i<25;++i){
+                                                for (int j=0;j<25;++j){
+                                                        if (maze[i][j]==0){
+                                                                t+="0";
+                                                        } else {
+                                                                t+="1";
+                                                        }
+                                                }
+                                        }
+                                        char const *s=t.c_str();
+                                        send(new_socket,s,1024,0);
 				}
 			}
 		}
@@ -105,13 +148,36 @@ int main(int argc, char* args[]) {
 			bool quit = false;
 			SDL_Event e;
 			SDL_RenderClear(render);
-			vector<pair<int, int>> loc = randspawn(200,200, 680,680);
+			vector<pair<int, int>> loc = randspawn(40,40, 920,920);
 			for (auto i : loc) {
 				eid++;
 				en.push_back(Enemy(eid, loadTexture(loadPNG("Textures/enemy.png")), i));
 			}
-			Player p1 = Player(loadTexture(loadPNG("Textures/p1.png")), 200,200);
-			Player p2 = Player(loadTexture(loadPNG("Textures/p2.png")), 680,680);
+			string s="00400040000;";
+			for (auto i:en){
+				string temp=to_string(i.locations.first);
+				for (int i=0;i<(4-temp.size());++i){
+					s+="0";
+				}
+				s+=temp;
+				temp=to_string(i.locations.second);
+                                for (int i=0;i<(4-temp.size());++i){
+                                        s+="0";
+                                }
+                                s+=temp;
+				s+=to_string(i.dir);
+				temp=to_string(i.id);
+				for (int i=0;i<(3-temp.size());++i){
+                                        s+="0";
+                                }
+				s+=temp;
+			}
+			s+=";0;0";
+			cout << s << '\n';
+			const char *t=s.c_str();
+			send(new_socket,t,1024,0);
+			Player p1 = Player(loadTexture(loadPNG("Textures/p1.png")), 40,40);
+			Player p2 = Player(loadTexture(loadPNG("Textures/p2.png")), 920,920);
 			SDL_Texture* bombidle = loadTexture(loadPNG("Textures/bomb.png"));
 			SDL_Texture* bombexp = loadTexture(loadPNG("Textures/bombexpnew.png"));
 			arrow = loadTexture(loadPNG("Textures/arrow-scaled.png"));
@@ -119,6 +185,7 @@ int main(int argc, char* args[]) {
 			lb = loadTexture(loadPNG("Textures/lootbox.png"));
 			int timer1 = -1; int timer2 = -1;
 			Mix_PlayMusic(bgm, 1);
+			bool bombt=0; bool bult=0;
 			while (!quit) {
 				SDL_RenderCopy(render, gexp, NULL, NULL);
 				SDL_Rect out = { 1000,0,200,1000 };
@@ -229,6 +296,7 @@ int main(int argc, char* args[]) {
 						p1.carrow--;
 						timer1 = 5;
 						p1.choose = 1;
+						bult=1;
 					}
 				}
 				else if (keystate[SDL_SCANCODE_L]) {
@@ -236,69 +304,9 @@ int main(int argc, char* args[]) {
 						p1.cbomb--;
 						bombs.push_back(Bomb(p1.x, p1.y, p1.curr, maze, 1, bombidle, bombexp));
 						p1.choose = 2;
+						bombt=1;
 					}
 				}
-				if (keystate[SDL_SCANCODE_W]) {
-					if (p2.choose == 0) {
-						if (p2.curr == 0) {
-							if (!CollisionP1P2(p1.x, p1.y, p2.x, p2.y - 20))
-								p2.y = p2.y - SPRITE / 2; p2.moving = 1;
-						}
-						else {
-							p2.curr = 0;
-						}
-					}
-				}
-				else if (keystate[SDL_SCANCODE_S]) {
-					if (p2.choose == 0) {
-						if (p2.curr == 2) {
-							if (!CollisionP1P2(p1.x, p1.y, p2.x, p2.y + 20))
-								p2.y = p2.y + SPRITE / 2; p2.moving = 1;
-						}
-						else {
-							p2.curr = 2;
-						}
-					}
-				}
-				else if (keystate[SDL_SCANCODE_A]) {
-					if (p2.choose == 0) {
-						if (p2.curr == 1) {
-							if (!CollisionP1P2(p1.x, p1.y, p2.x - 20, p2.y))
-								p2.x = p2.x - SPRITE / 2; p2.moving = 1;
-						}
-						else {
-							p2.curr = 1;
-						}
-					}
-				}
-				else if (keystate[SDL_SCANCODE_D]) {
-					if (p2.choose == 0) {
-						if (p2.curr == 3) {
-							if (!CollisionP1P2(p1.x, p1.y, p2.x + 20, p2.y))
-								p2.x = p2.x + SPRITE / 2; p2.moving = 1;
-						}
-						else {
-							p2.curr = 3;
-						}
-					}
-				}
-				else if (keystate[SDL_SCANCODE_Q]) {
-					if (p2.carrow > 0 && p2.choose == 0) {
-						Mix_PlayChannel(-1, bowsound, 0);
-						p2.carrow--;
-						timer2 = 5;
-						p2.choose = 1;
-					}
-				}
-				else if (keystate[SDL_SCANCODE_E]) {
-					if (p2.cbomb > 0 && p2.choose == 0) {
-						p2.cbomb--;
-						bombs.push_back(Bomb(p2.x, p2.y, p2.curr, maze, 2, bombidle, bombexp));
-						p2.choose = 2;
-					}
-				}
-
-
 				int j1 = p1.x / 40, j2 = (p1.y + 39) / 40;
 				for(auto cc:things[j1][j2])
 				if (cc == 1) p1.carrow++;
@@ -324,6 +332,11 @@ int main(int argc, char* args[]) {
 						quit = true;
 					}
 				}
+				if (CollisionMaze(p1.x, p1.y, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE, maze, loc)) {
+                                        p1.x = store[0];
+                                        p1.y = store[1];
+                                        p1.moving = 0;
+                                }
 				if (timer1 > 0) {
 					timer1--;
 				}
@@ -338,16 +351,39 @@ int main(int argc, char* args[]) {
 					bul.push_back(bullet(arrow, p2.curr, p2.x, p2.y, 2));
 					timer2--;
 				}
-				if (CollisionMaze(p1.x, p1.y, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE, maze, loc)) {
-					p1.x = store[0];
-					p1.y = store[1];
-					p1.moving = 0;
+				valread=read(new_socket,buffer,1024);
+				vector<int> tt=parse((string)buffer);
+				p2.x=tt[0]; p2.y=tt[1]; p2.curr=tt[2]; p2.moving=tt[3]; p2.choose=tt[4];
+				if (tt[5]){
+					p2.cbomb--;
+                                                bombs.push_back(Bomb(p2.x, p2.y, p2.curr, maze, 2, bombidle, bombexp));
+                                                p2.choose = 2;
 				}
-				if (CollisionMaze(p2.x, p2.y, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE, maze, loc)) {
-					p2.x = store[2];
-					p2.y = store[3];
-					p2.moving = 0;
+				if (tt[6]){
+					Mix_PlayChannel(-1, bowsound, 0);
+                                        p2.carrow--;
+                                        timer2 = 5;
+                                        p2.choose = 1;
 				}
+				string s="";
+                                string stemp=to_string(p1.x);
+                                for (int i=0;i<(4-stemp.size());++i){
+                                        s+="0";
+                                }
+                                s+=stemp;
+                                stemp=to_string(p1.y);
+                                for (int i=0;i<(4-stemp.size());++i){
+                                        s+="0";
+                                }
+                                s+=stemp;
+                                s+=to_string(p1.curr);
+                                s+=to_string(p1.moving);
+                                s+=to_string(p1.choose);
+                                s+=";"; s+=";";
+                                if (bombt) s+="1"; else s+="0"; s+=";";
+                                if (bult) s+="1"; else s+="0";
+                                char const *t=s.c_str();
+                                send(new_socket,t,1024,0);
 				vector<pair<int, int>> etemp = move(p1.y, p1.x, p2.y, p2.x, loc);
 				for (int i = 0; i < bombs.size(); ++i) {
 					bombs[i].Tick();
@@ -462,11 +498,10 @@ int main(int argc, char* args[]) {
 				p1.moving = 0; p2.moving = 0;
 				SDL_Delay(1000 / 12);
 				ehit.clear();
-				pl.clear();
+				pl.clear(); bult=0; bombt=0;
 			}
 		}
 	}
 	close();
 	return 0;
 }
-
