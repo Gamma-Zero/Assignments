@@ -329,13 +329,12 @@ int main(int argc, char* args[]) {
                                         p1.choose = 1;
                                 }
 				for(int i=7;i<tt.size();i+=4){
-					cout << tt[i] << " " << tt[i+1] << " " << tt[i+3] << '\n';
 					bool f=0;
-					for (int i=0;i<en.size();++i){
-						if (en[i].id==tt[i+3]){
+					for (int j=0;j<en.size();++j){
+						if (en[j].id==tt[i+3]){
 							f=1;
-							en[i].locations={tt[i],tt[i+1]};
-							loc[i]={tt[i],tt[i+1]};
+							en[j].locations={tt[i],tt[i+1]};
+							loc[j]={tt[i],tt[i+1]};
 							break;
 						}
 					}

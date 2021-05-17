@@ -387,7 +387,7 @@ int main(int argc, char* args[]) {
 									while ((int)ss1.size() < 4) ss1 = "0" + ss1;
 									while ((int)ss2.size() < 4) ss2 = "0" + ss2;
 									while ((int)ss4.size() < 3) ss4 = "0" + ss4;
-									cout << v1 << " " << v2 << " " << v3 << '\n';
+									cout << v1 << " " << v2 << " " << v4 << '\n';
 									s += ss1;
 									s += ss2;
 									s += ss3;
