@@ -80,9 +80,13 @@ pair<int, int> pspawn(int x1, int y1, int x2, int y2, vector<pair<int, int>>cur)
 	for (int i = 0; i < cur.size(); ++i) enemy[25 * (cur[i].second / 40) + (cur[i].first / 40)] = 1;
 	vector<int>fr1;
 	vector<pair<int, int>>avail;
+	srand(time(0));
+	int x3 = rand() % 2;
 	for (int i = 0; i < frcell.size(); ++i)
 	{
 		if (dis[frcell[i]][25 * y1 + x1] <= 5 || dis[frcell[i]][25 * y2 + x2] <= 5 || enemy[frcell[i]] == 1) continue;
+		if (x3 == 0 && (dis[frcell[i]][25 * y1 + x1] <= dis[frcell[i]][25 * y2 + x2])) continue;
+		if (x3 == 1 && (dis[frcell[i]][25 * y1 + x1] >= dis[frcell[i]][25 * y2 + x2])) continue;
 		int block = frcell[i], weight = dis[block][25 * y1 + x1] * dis[block][25 * y2 + x2];
 		avail.push_back({ weight,block });
 	}
