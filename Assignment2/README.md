@@ -1,3 +1,4 @@
 Things left:
 Take IP and port as input from user.
-Modularity in code.
+Modularity in main files.
+Last round of checking.

@@ -1,4 +1,4 @@
-#include "AnimationWrappers.h"
+#include "Bullet.h"
 #include "CollisionDetection.h"
 
 struct Bomb{
