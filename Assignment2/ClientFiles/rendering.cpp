@@ -352,6 +352,12 @@ int main(int argc, char* args[]) {
 							break;
 						}
 					}
+					for (int j=0;j<tokill.size();++j){
+						if (tokill[j].id==tt[i+3]){
+							f=1;
+							break;
+						}
+					}
 					if (!f){
                                         	loc.push_back({tt[i],tt[i+1]});
                                         	en.push_back(Enemy(tt[i+3], loadTexture(loadPNG("Textures/enemy.png")), {tt[i],tt[i+1]}));
@@ -402,6 +408,7 @@ int main(int argc, char* args[]) {
 				vector<pair<int, int>> tloc;
 				vector<Enemy> ten;
 				for (int i = 0; i < etemp.size(); ++i) {
+					cout << en[i].id << " " ;
 					auto it = find(ehit.begin(), ehit.end(), en[i].id);
 					if (it == ehit.end()) {
 						int curr = finddir(loc[i], etemp[i]);
@@ -420,6 +427,7 @@ int main(int argc, char* args[]) {
 						tokill.push_back(en[i]);
 					}
 				}
+				cout << '\n';
 				if (ehit.size()) {
 					schedule += 20;   //changes
 				}

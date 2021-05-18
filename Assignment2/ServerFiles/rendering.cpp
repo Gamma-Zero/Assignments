@@ -58,9 +58,10 @@ bool init() {
                                         SDL_Color fcolor={173,216,230};
                                         SDL_Color bcolor={0,0,0};
                                         SDL_Surface* temp=TTF_RenderText_Shaded(font,idle.c_str(),fcolor,bcolor);
+					SDL_Texture* tx=loadTexture(temp);
                                         SDL_Rect space={500,500,10*idle.size(),20};
-                                        SDL_BlitSurface(temp,NULL,screenSurface,&space);
-                                        SDL_UpdateWindowSurface(window);
+                                        SDL_RenderCopy(render,tx,NULL,&space);
+                                        SDL_RenderPresent(render);
 					if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
                                         {
                                                 perror("socket failed");
@@ -180,7 +181,6 @@ int main(int argc, char* args[]) {
 				s+=temp;
 			}
 			s+=";0;0;1000000510";
-			cout << s << '\n';
 			const char *t=s.c_str();
 			send(new_socket,t,1024,0);
 			Player p1 = Player(loadTexture(loadPNG("Textures/p1.png")), 40,40);
@@ -320,13 +320,11 @@ int main(int argc, char* args[]) {
 				else if (cc == 2) p1.HP += 20;
 				else if (cc == 3) p1.cbomb++;
 				else if (cc == 4) p1.score += 5;
-				//cout <<1<<' '<< p1.score << ' ' << p1.carrow << ' ' << p1.cbomb << ' ' << p1.HP << '\n';
 				things[j1][j2].clear();
 				j1 = p2.x / 40; j2 = (p2.y + 39) / 40;
                                 things[j1][j2].clear();
 				p1.HP = min(p1.HP, 100);
 				p2.HP = min(p2.HP, 100);
-				//cout << 2<<' '<<p2.score << ' ' << p2.carrow << ' ' << p2.cbomb << ' ' << p2.HP << '\n';
 
 
 				while (SDL_PollEvent(&e)) {
@@ -388,7 +386,6 @@ int main(int argc, char* args[]) {
 									while ((int)ss1.size() < 4) ss1 = "0" + ss1;
 									while ((int)ss2.size() < 4) ss2 = "0" + ss2;
 									while ((int)ss4.size() < 3) ss4 = "0" + ss4;
-									cout << v1 << " " << v2 << " " << v4 << '\n';
 									s += ss1;
 									s += ss2;
 									s += ss3;
@@ -464,6 +461,7 @@ int main(int argc, char* args[]) {
 				vector<pair<int, int>> tloc;
 				vector<Enemy> ten;
 				for (int i = 0; i < etemp.size(); ++i) {
+					cout << en[i].id << " ";
 					auto it = find(ehit.begin(), ehit.end(), en[i].id);
 					if (it == ehit.end()) {
 						int curr = finddir(loc[i], etemp[i]);
@@ -482,6 +480,7 @@ int main(int argc, char* args[]) {
 						tokill.push_back(en[i]);
 					}
 				}
+				cout << '\n';
 				if (ehit.size()) {
 					schedule += 20;   //changes
 				}
