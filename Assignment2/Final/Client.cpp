@@ -1,7 +1,7 @@
 #include "ClientLoaders.h"
 
 int main(int argc, char* args[]) {
-	if (!init()) {
+	if (!init(args[1],args[2])) {
 		printf("Failed\n");
 	}
 	else {
@@ -286,6 +286,13 @@ int main(int argc, char* args[]) {
 				}
 				vector<pair<int, int>> tloc;
 				vector<Enemy> ten;
+				for (int i = 0; i < 25; ++i) {
+                                        for (int j = 0; j < 25; ++j) {
+                                                if (things[i][j].size() != 0) {
+                                                        RenderBox(lb, render, i, j);
+                                                }
+                                        }
+                                }
 				for (int i = 0; i < etemp.size(); ++i) {
 					auto it = find(ehit.begin(), ehit.end(), en[i].id);
 					if (it == ehit.end()) {
@@ -312,10 +319,10 @@ int main(int argc, char* args[]) {
 				loc = tloc;
 				ten.clear();
 				for (int i = 0; i < tokill.size(); ++i) {
-					if (!tokill[i].triggerDeath(render)) {
-						ten.push_back(tokill[i]);
-					}
-				}
+                                        if (!tokill[i].triggerDeath(render)) {
+                                                ten.push_back(tokill[i]);
+                                        }
+                                }
 				tokill = ten;
 				p1.HP = max(p1.HP, 0);
 				p2.HP = max(p2.HP, 0);

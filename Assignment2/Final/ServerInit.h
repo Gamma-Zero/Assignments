@@ -8,7 +8,7 @@
 #include "Global.h"
 #include "font.h"
 
-bool init(){
+bool init(string ip, string port){
 	bool success = true;
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
@@ -71,8 +71,8 @@ bool init(){
                                                 exit(EXIT_FAILURE);
                                         }
                                         address.sin_family = AF_INET;
-                                        address.sin_addr.s_addr = INADDR_ANY;
-                                        address.sin_port = htons( PORT );
+                                        address.sin_addr.s_addr = inet_addr(ip.c_str());
+                                        address.sin_port = htons(stoi(port));
                                         if (bind(server_fd, (struct sockaddr *)&address, sizeof(address))<0)
                                         {
                                                 perror("bind failed");

@@ -1,7 +1,7 @@
 #include "ServerLoaders.h"
 
 int main(int argc, char* args[]) {
-	if (!init()) {
+	if (!init(args[1],args[2])) {
 		printf("Failed\n");
 	}
 	else {
@@ -317,6 +317,13 @@ int main(int argc, char* args[]) {
 				}
 				vector<pair<int, int>> tloc;
 				vector<Enemy> ten;
+				for (int i = 0; i < 25; ++i) {
+                                        for (int j = 0; j < 25; ++j) {
+                                                if (things[i][j].size() != 0) {
+                                                        RenderBox(lb, render, i, j);
+                                                }
+                                        }
+                                }
 				for (int i = 0; i < etemp.size(); ++i) {
 					auto it = find(ehit.begin(), ehit.end(), en[i].id);
 					if (it == ehit.end()) {
@@ -366,13 +373,6 @@ int main(int argc, char* args[]) {
 					else if (p2.score > p1.score) cout << "Player 2 Wins";
 					else cout << "Mutual Destruction";
 					quit = true;
-				}
-				for (int i = 0; i < 25; ++i) {
-					for (int j = 0; j < 25; ++j) {
-						if (things[i][j].size() != 0) {
-							RenderBox(lb, render, i, j);
-						}
-					}
 				}
 				p1.RenderPlayer(render, SDL_Rect{ p1.x,p1.y,SPRITE,SPRITE });
 				p2.RenderPlayer(render, SDL_Rect{ p2.x,p2.y,SPRITE,SPRITE });
