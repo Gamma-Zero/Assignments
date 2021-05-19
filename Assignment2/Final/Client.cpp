@@ -31,7 +31,7 @@ int main(int argc, char* args[]) {
 			int timer1 = -1; int timer2 = -1; bool bult=0; bool bombt=0;
 			Mix_PlayMusic(bgm, 1);
 			while (!quit) {
-				if (frame1==1800){
+				if (frame1==1800 && win==-1){
                                         if (p1.score>p2.score){
                                                 win=1;
                                         } else if (p1.score<p2.score){
@@ -40,7 +40,6 @@ int main(int argc, char* args[]) {
                                                 win=3;
                                         }
                                 }
-                                frame1++;
 				if (win!=-1){
                                         while (SDL_PollEvent(&e)) {
                                                 if (e.type == SDL_QUIT) {
@@ -65,6 +64,7 @@ int main(int argc, char* args[]) {
                                         SDL_RenderClear(render);
                                         continue;
                                 }
+				frame1++;
 				SDL_RenderCopy(render, gexp, NULL, NULL);
 				SDL_Rect out = { 1000,0,200,1000 };
 				SDL_RenderFillRect(render, &out);

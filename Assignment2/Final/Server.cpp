@@ -52,7 +52,7 @@ int main(int argc, char* args[]) {
 			Mix_PlayMusic(bgm, 1);
 			bool bombt=0; bool bult=0;
 			while (!quit) {
-				if (frame1==1800){
+				if (frame1==1800 && win==-1){
 					if (p1.score>p2.score){
 						win=1;
 					} else if (p1.score<p2.score){
@@ -61,7 +61,6 @@ int main(int argc, char* args[]) {
 						win=3;
 					}
 				}
-				frame1++;
 				if (win!=-1){
 					while (SDL_PollEvent(&e)) {
                                         	if (e.type == SDL_QUIT) {
@@ -85,7 +84,8 @@ int main(int argc, char* args[]) {
                                         SDL_RenderPresent(render);
 					SDL_RenderClear(render);
 					continue;
-				}	
+				}
+				frame1++;	
 				SDL_RenderCopy(render, gexp, NULL, NULL);
 				SDL_Rect out = { 1000,0,200,1000 };
 				SDL_RenderFillRect(render, &out);
@@ -251,19 +251,19 @@ int main(int argc, char* args[]) {
                                 s+=to_string(p1.moving);
                                 s+=to_string(p1.choose);
                                 s+=";"; 
-								for (int i = 0; i < (int)en.size(); ++i)
-								{
-									int v1= en[i].locations.first, v2=en[i].locations.second, v3=en[i].dir, v4=en[i].id ;
-									string ss1 = to_string(v1), ss2 = to_string(v2), ss3 = to_string(v3), ss4 = to_string(v4);
-									while ((int)ss1.size() < 4) ss1 = "0" + ss1;
-									while ((int)ss2.size() < 4) ss2 = "0" + ss2;
-									while ((int)ss4.size() < 3) ss4 = "0" + ss4;
-									s += ss1;
-									s += ss2;
-									s += ss3;
-									s += ss4;
-								}
-								s+=";";
+				for (int i = 0; i < (int)en.size(); ++i)
+				{
+					int v1= en[i].locations.first, v2=en[i].locations.second, v3=en[i].dir, v4=en[i].id ;
+					string ss1 = to_string(v1), ss2 = to_string(v2), ss3 = to_string(v3), ss4 = to_string(v4);
+					while ((int)ss1.size() < 4) ss1 = "0" + ss1;
+					while ((int)ss2.size() < 4) ss2 = "0" + ss2;
+					while ((int)ss4.size() < 3) ss4 = "0" + ss4;
+					s += ss1;
+					s += ss2;
+					s += ss3;
+					s += ss4;
+				}
+				s+=";";
                                 if (bombt) s+="1"; else s+="0"; s+=";";
                                 if (bult) s+="1"; else s+="0"; s+=";";
 				stemp=to_string(p1.HP);
