@@ -18,6 +18,7 @@ Resources:
 5) https://discourse.libsdl.org/c/sdl-development/6
 6) itch.io (For Game Assets)
 7) http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/#
+8) Square Enix Music (for the background music)
 
 How to Run:
 make all to generate executables Server and Client. Server takes IP address and port as input. Client has to be given the same IP address and port as input.
