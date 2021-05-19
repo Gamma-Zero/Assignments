@@ -29,7 +29,7 @@ int main(int argc, char* args[]) {
 			wall = loadTexture(loadPNG("Textures/wall.png"));
 			lb = loadTexture(loadPNG("Textures/lootbox.png"));
 			int timer1 = -1; int timer2 = -1; bool bult=0; bool bombt=0;
-	//		Mix_PlayMusic(bgm, 1);
+			Mix_PlayMusic(bgm, 1);
 			while (!quit) {
 				if (frame1==1800){
                                         if (p1.score>p2.score){

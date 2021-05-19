@@ -49,7 +49,7 @@ int main(int argc, char* args[]) {
 			wall = loadTexture(loadPNG("Textures/wall.png"));
 			lb = loadTexture(loadPNG("Textures/lootbox.png"));
 			int timer1 = -1; int timer2 = -1;
-	//		Mix_PlayMusic(bgm, 1);
+			Mix_PlayMusic(bgm, 1);
 			bool bombt=0; bool bult=0;
 			while (!quit) {
 				if (frame1==1800){
