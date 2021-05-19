@@ -171,43 +171,23 @@ int main(int argc, char* args[]) {
 						bombt=1;
 					}
 				}
-				int j1 = p1.x / 40, j2 = (p1.y + 39) / 40;
-				for(auto cc:things[j1][j2])
-				if (cc == 1) p1.carrow++;
-				else if (cc == 2) p1.HP += 20;
-				else if (cc == 3) p1.cbomb++;
-				else if (cc == 4) p1.score += 5;
-				things[j1][j2].clear();
-				j1 = p2.x / 40; j2 = (p2.y + 39) / 40;
-                                things[j1][j2].clear();
-				p1.HP = min(p1.HP, 100);
-				p2.HP = min(p2.HP, 100);
-
-
-				while (SDL_PollEvent(&e)) {
-					if (e.type == SDL_QUIT) {
-						quit = true;
-					}
-				}
 				if (CollisionMaze(p1.x, p1.y, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE, maze, loc)) {
                                         p1.x = store[0];
                                         p1.y = store[1];
                                         p1.moving = 0;
                                 }
-				if (timer1 > 0) {
-					timer1--;
+				while (SDL_PollEvent(&e)) {
+					if (e.type == SDL_QUIT) {
+						quit = true;
+					}
 				}
-				else if (timer1 == 0) {
-					bul.push_back(bullet(arrow, p1.curr, p1.x, p1.y, 1));
-					timer1--;
-				}
-				if (timer2 > 0) {
-					timer2--;
-				}
-				else if (timer2 == 0) {
-					bul.push_back(bullet(arrow, p2.curr, p2.x, p2.y, 2));
-					timer2--;
-				}
+				int j1 = p1.x / 40, j2 = (p1.y + 39) / 40;
+                                for(auto cc:things[j1][j2])
+                                if (cc == 1) p1.carrow++;
+                                else if (cc == 2) p1.HP += 20;
+                                else if (cc == 3) p1.cbomb++;
+                                else if (cc == 4) p1.score += 5;
+                                things[j1][j2].clear();
 				valread=read(new_socket,buffer,1024);
 				vector<int> tt=parse((string)buffer);
 				p2.x=tt[0]; p2.y=tt[1]; p2.curr=tt[2]; p2.moving=tt[3]; p2.choose=tt[4];
@@ -273,6 +253,24 @@ int main(int argc, char* args[]) {
                                 s+=stemp;
                                 char const *t=s.c_str();
                                 send(new_socket,t,1024,0);
+				if (timer1 > 0) {
+                                        timer1--;
+                                }
+                                else if (timer1 == 0) {
+                                        bul.push_back(bullet(arrow, p1.curr, p1.x, p1.y, 1));
+                                        timer1--;
+                                }
+                                if (timer2 > 0) {
+                                        timer2--;
+                                }
+                                else if (timer2 == 0) {
+                                        bul.push_back(bullet(arrow, p2.curr, p2.x, p2.y, 2));
+                                        timer2--;
+                                }
+                                j1 = p2.x / 40; j2 = (p2.y + 39) / 40;
+                                things[j1][j2].clear();
+                                p1.HP = min(p1.HP, 100);
+                                p2.HP = min(p2.HP, 100);
 				vector<pair<int, int>> etemp = move(p1.y, p1.x, p2.y, p2.x, loc);
 				for (int i = 0; i < bombs.size(); ++i) {
 					bombs[i].Tick();

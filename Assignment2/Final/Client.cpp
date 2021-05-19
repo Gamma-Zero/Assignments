@@ -42,6 +42,9 @@ int main(int argc, char* args[]) {
 					}
 				}
 				frame++;
+				if (frame==360){
+					frame=0;
+				}
 				int store[4] = { p1.x,p1.y,p2.x,p2.y };
 				p1.passiveAnimate();
 				p2.passiveAnimate();
@@ -134,9 +137,12 @@ int main(int argc, char* args[]) {
 						bombt=1;
 					}
 				}
-				int j1 = p1.x / 40, j2 = (p1.y + 39) / 40;
-				things[j1][j2].clear();
-				j1 = p2.x / 40; j2 = (p2.y + 39) / 40;
+				if (CollisionMaze(p2.x, p2.y, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE, maze, loc)) {
+                                        p2.x = store[2];
+                                        p2.y = store[3];
+                                        p2.moving = 0;
+                                }
+				int j1 = p2.x / 40;int j2 = (p2.y + 39) / 40;
 				for(auto cc:things[j1][j2])
 				if (cc == 1) p2.carrow++;
 				else if (cc == 2) p2.HP += 20;
@@ -145,29 +151,10 @@ int main(int argc, char* args[]) {
 				things[j1][j2].clear();
 				p1.HP = min(p1.HP, 100);
 				p2.HP = min(p2.HP, 100);
-				if (CollisionMaze(p2.x, p2.y, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE, maze, loc)) {
-                                        p2.x = store[2];
-                                        p2.y = store[3];
-                                        p2.moving = 0;
-                                }
 				while (SDL_PollEvent(&e)) {
 					if (e.type == SDL_QUIT) {
 						quit = true;
 					}
-				}
-				if (timer1 > 0) {
-					timer1--;
-				}
-				else if (timer1 == 0) {
-					bul.push_back(bullet(arrow, p1.curr, p1.x, p1.y, 1));
-					timer1--;
-				}
-				if (timer2 > 0) {
-					timer2--;
-				}
-				else if (timer2 == 0) {
-					bul.push_back(bullet(arrow, p2.curr, p2.x, p2.y, 2));
-					timer2--;
 				}
 				string s="";
 				string stemp=to_string(p2.x);
@@ -220,6 +207,24 @@ int main(int argc, char* args[]) {
                                         Mix_PlayChannel(-1, bowsound, 0);
                                         timer1 = 5;
                                         p1.choose = 1;
+                                }
+				j1 = p1.x / 40, j2 = (p1.y + 39) / 40;
+                                things[j1][j2].clear();
+                                p1.HP = min(p1.HP, 100);
+                                p2.HP = min(p2.HP, 100);
+				if (timer1 > 0) {
+                                        timer1--;
+                                }
+                                else if (timer1 == 0) {
+                                        bul.push_back(bullet(arrow, p1.curr, p1.x, p1.y, 1));
+                                        timer1--;
+                                }
+                                if (timer2 > 0) {
+                                        timer2--;
+                                }
+                                else if (timer2 == 0) {
+                                        bul.push_back(bullet(arrow, p2.curr, p2.x, p2.y, 2));
+                                        timer2--;
                                 }
 				for(int i=11;i<tt.size();i+=4){
 					bool f=0;
