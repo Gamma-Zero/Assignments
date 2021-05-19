@@ -32,6 +32,7 @@ vector<int> ehit, pl;
 vector<vector<vector<int>>>things(25, vector<vector<int>>(25));
 int frame=0;
 int eid=0;
+int win=-1;
 int schedule=-1;
 Mix_Music *bgm;
 Mix_Chunk *bombsound, *bowsound;

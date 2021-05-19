@@ -10,6 +10,7 @@ int main(int argc, char* args[]) {
 			printf("Failed\n");
 		}
 		else {
+			int frame1=0;
 			bool quit = false;
 			SDL_Event e;
 			SDL_RenderClear(render);
@@ -48,9 +49,43 @@ int main(int argc, char* args[]) {
 			wall = loadTexture(loadPNG("Textures/wall.png"));
 			lb = loadTexture(loadPNG("Textures/lootbox.png"));
 			int timer1 = -1; int timer2 = -1;
-			Mix_PlayMusic(bgm, 1);
+	//		Mix_PlayMusic(bgm, 1);
 			bool bombt=0; bool bult=0;
 			while (!quit) {
+				if (frame1==1800){
+					if (p1.score>p2.score){
+						win=1;
+					} else if (p1.score<p2.score){
+						win=2;
+					} else {
+						win=3;
+					}
+				}
+				frame1++;
+				if (win!=-1){
+					while (SDL_PollEvent(&e)) {
+                                        	if (e.type == SDL_QUIT) {
+                                                	quit = true;
+                                        	}
+                                	}
+					string disp;
+					if (win==1){
+						disp="Player 1 Won!!";
+					} else if (win==2){
+						disp="Player 2 Won!!";
+					} else {
+						disp="Mutual Destruction!!";
+					}
+                                        SDL_Color fcolor={173,216,230};
+                                        SDL_Color bcolor={0,0,0};
+                                        SDL_Surface* temp=TTF_RenderText_Shaded(font,disp.c_str(),fcolor,bcolor);
+                                        SDL_Texture* tx=loadTexture(temp);
+                                        SDL_Rect space={500,500,10*disp.size(),20};
+                                        SDL_RenderCopy(render,tx,NULL,&space);
+                                        SDL_RenderPresent(render);
+					SDL_RenderClear(render);
+					continue;
+				}	
 				SDL_RenderCopy(render, gexp, NULL, NULL);
 				SDL_Rect out = { 1000,0,200,1000 };
 				SDL_RenderFillRect(render, &out);
@@ -97,7 +132,7 @@ int main(int argc, char* args[]) {
 					if (p1.rest == 0)
 					{
 						p1.HP -= 10;
-						p1.rest = 21;
+						p1.rest = 16;
 					}
 				}
 				if (danger2)
@@ -105,7 +140,7 @@ int main(int argc, char* args[]) {
 					if (p2.rest == 0)
 					{
 						p2.HP -= 10;
-						p2.rest = 21;
+						p2.rest = 16;
 					}
 				}
 				if (p1.rest > 0) --p1.rest;
@@ -154,7 +189,7 @@ int main(int argc, char* args[]) {
 						}
 					}
 				}
-				else if (keystate[SDL_SCANCODE_SPACE]) {
+				else if (keystate[SDL_SCANCODE_Q]) {
 					if (p1.carrow > 0 && p1.choose == 0) {
 						Mix_PlayChannel(-1, bowsound, 0);
 						p1.carrow--;
@@ -163,7 +198,7 @@ int main(int argc, char* args[]) {
 						bult=1;
 					}
 				}
-				else if (keystate[SDL_SCANCODE_L]) {
+				else if (keystate[SDL_SCANCODE_E]) {
 					if (p1.cbomb > 0 && p1.choose == 0) {
 						p1.cbomb--;
 						bombs.push_back(Bomb(p1.x, p1.y, p1.curr, maze, 1, bombidle, bombexp));
@@ -357,20 +392,17 @@ int main(int argc, char* args[]) {
 				p2.HP = max(p2.HP, 0);
 				if (p1.HP > 0 && p2.HP <= 0)
 				{
-					cout << "Player 1 Wins!!";
-					quit = true;
+					win=1;
 				}
 				else if (p2.HP > 0 && p1.HP <= 0)
 				{
-					cout << "Player 2 Wins!!";
-					quit = true;
+					win=2;
 				}
 				else if (p1.HP <= 0 && p2.HP <= 0)
 				{
-					if (p1.score > p2.score) cout << "Player 1 Wins";
-					else if (p2.score > p1.score) cout << "Player 2 Wins";
-					else cout << "Mutual Destruction";
-					quit = true;
+					if (p1.score > p2.score) win=1;
+					else if (p2.score > p1.score) win=2;
+					else win=3;
 				}
 				p1.RenderPlayer(render, SDL_Rect{ p1.x,p1.y,SPRITE,SPRITE });
 				p2.RenderPlayer(render, SDL_Rect{ p2.x,p2.y,SPRITE,SPRITE });
