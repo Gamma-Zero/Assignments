@@ -27,6 +27,15 @@ SDL_Texture* loadTexture(SDL_Surface* input){
         return temp;
 }
 
+void printscr(string idle, int x, int y){
+        SDL_Color fcolor={173,216,230};
+        SDL_Color bcolor={0,0,0};
+        SDL_Surface* t=TTF_RenderText_Shaded(font,idle.c_str(),fcolor,bcolor);
+        SDL_Texture* tx=loadTexture(t);
+        SDL_Rect space={x,y,10*idle.size(),20};
+        SDL_RenderCopy(render,tx,NULL,&space);
+}
+
 SDL_Surface* loadBMP(string path) {
         SDL_Surface* temp = SDL_LoadBMP(path.c_str());
         if (temp == NULL) {

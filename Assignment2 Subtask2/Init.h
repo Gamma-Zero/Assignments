@@ -16,7 +16,7 @@ bool init(){
 			exit(1);
 		}
 		TTF_Init();
-		window = SDL_CreateWindow("Simulated Annealing Simulation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1200, 1000, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE);
+		window = SDL_CreateWindow("Simulated Annealing Simulation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1250, 1000, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE);
 		if (window == NULL)
 		{
 			printf("Window died: %s\n", SDL_GetError());
