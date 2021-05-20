@@ -57,15 +57,9 @@ int main()
 			float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 			int length2 = 0;
 			swap(target[take2], target[take1]);
-			for (auto ii:target){
-				int x=ii%50; int y=ii/50;
-				SDL_Rect temp={20*x,20*y,20,20};
-                                SDL_RenderCopy(render,chest,NULL,&temp);
-			}
 			for (int w = 0; w < (int)target.size() - 1; ++w)
 				length2 += dis[target[w]][target[w + 1]];
 			swap(target[take2], target[take1]);
-			cout << target[take1] << " " << target[take2] << '\n';
 			for (int ii=1;ii<target.size();++ii){
 				cout << target[ii] << " ";
 				auto p=Path(target[ii-1]%50,target[ii-1]/50,target[ii]%50,target[ii]/50);
@@ -75,6 +69,14 @@ int main()
 				}
 			}
 			cout << '\n';
+			for (auto ii:target){
+                                int x=ii%50; int y=ii/50;
+                                SDL_Rect temp={20*x,20*y,20,20};
+                                SDL_RenderCopy(render,chest,NULL,&temp);
+                        }
+                        for (int w = 0; w < (int)target.size() - 1; ++w)
+                                length2 += dis[target[w]][target[w + 1]];
+                        swap(target[take2], target[take1]);
 			float exponent = (length - length2) / (k * temp);
 			float power = exp(exponent);
 			if (length2 < length)

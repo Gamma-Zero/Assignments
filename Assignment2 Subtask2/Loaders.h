@@ -18,7 +18,7 @@ int finddir(pair<int, int> s, pair<int, int> e) {
 }
 
 SDL_Texture* loadTexture(SDL_Surface* input){
-        Uint32 colorkey=SDL_MapRGB(input->format,255,255,255);
+        Uint32 colorkey=SDL_MapRGB(input->format,0,0,0);
         SDL_SetColorKey(input,SDL_TRUE,colorkey);
         SDL_Texture* temp=SDL_CreateTextureFromSurface(render,input);
         if (temp==NULL){
