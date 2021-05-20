@@ -26,7 +26,7 @@ bool init(string ip, string port){
 		bgm = Mix_LoadMUS("Audio/bgm.mp3");
 		bombsound = Mix_LoadWAV("Audio/bomb.wav");
 		bowsound = Mix_LoadWAV("Audio/bow.wav");
-		window = SDL_CreateWindow("Darkest Curse of the Dead Cells", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE);
+		window = SDL_CreateWindow("Slay the Dungeon", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE);
 		if (window == NULL)
 		{
 			printf("Window died: %s\n", SDL_GetError());
