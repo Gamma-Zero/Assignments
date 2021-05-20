@@ -23,7 +23,7 @@ int main()
 		length += dis[target[i]][target[i+1]];
 	int sz = target.size() - 2;
 	srand(time(0));
-	float temp = 1.0, factor=0.9, k=50.0;
+	float temp = 0.5, factor=0.9, k=100.0;
 	cout << length << '\n';
 	bool quit=false;
 	while (!quit){
@@ -56,6 +56,9 @@ int main()
 			int take2 = 1 + rand() % sz;
 			float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 			int length2 = 0;
+			swap(target[take2], target[take1]);
+			for (int w = 0; w < (int)target.size() - 1; ++w)
+				length2 += dis[target[w]][target[w + 1]];
 			swap(target[take2], target[take1]);
 			for (int ii=1;ii<target.size();++ii){
 		//		cout << target[ii] << " ";
