@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 vector<vector<int>>cell(50, vector<int>(50, 0));
-vector<pair<int, int>>edge, unused;
+vector<pair<int, int>>edge, fr1cell;
 vector<int>num(2510), parent(2510), target;
 vector<vector<int>>dis(2510, vector<int>(2510, 1000000));
 int find(int a)
@@ -157,7 +157,6 @@ void Maze()
 	{
 		int s = edge.size();
 		int index = rand() % s;
-		if (find(edge[index].first) == find(edge[index].second)) unused.push_back(edge[index]);
 		join(edge[index].first, edge[index].second);
 		vector<pair<int, int>>edge1;
 		for (int i = 0; i < s; ++i)
@@ -167,11 +166,10 @@ void Maze()
 		}
 		edge = edge1;
 	}
-	for (int i = 0; i < (int)unused.size()/2; ++i)
-	{
-		int cur1 = unused[i].first, cur2 = unused[i].second, cur3 = (cur1 + cur2) / 2, curx = cur3 % 50, cury = cur3 / 50;
-		cell[curx][cury] = 1;
-	}
+	for(int i = 0; i < 50; ++i) for (int j = 0; j < 50; ++j) if (cell[i][j] == 0) fr1cell.push_back({ i,j });
+	random_shuffle(fr1cell.begin(), fr1cell.end());
+	for (int i = 0; i < (int)fr1cell.size()/4; ++i)
+		cell[fr1cell[i].first][fr1cell[i].second] = 1;
 	for (int i = 0; i < 50; ++i)
 	{
 		for (int j = i + 1; j < 50; ++j)
