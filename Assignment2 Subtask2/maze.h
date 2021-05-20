@@ -15,10 +15,7 @@ void join(int a, int b)
 	int u = find(a);
 	int v = find(b);
 	if (u == v)
-	{
-		unused.push_back({ u,v });
 		return;
-	}
 	if (num[u] < num[v])
 	{
 		parent[u] = v;
@@ -160,6 +157,7 @@ void Maze()
 	{
 		int s = edge.size();
 		int index = rand() % s;
+		if (find(edge[index].first) == find(edge[index].second)) unused.push_back(edge[index]);
 		join(edge[index].first, edge[index].second);
 		vector<pair<int, int>>edge1;
 		for (int i = 0; i < s; ++i)
@@ -168,6 +166,11 @@ void Maze()
 			edge1.push_back(edge[i]);
 		}
 		edge = edge1;
+	}
+	for (int i = 0; i < (int)unused.size()/2; ++i)
+	{
+		int cur1 = unused[i].first, cur2 = unused[i].second, cur3 = (cur1 + cur2) / 2, curx = cur3 % 50, cury = cur3 / 50;
+		cell[curx][cury] = 1;
 	}
 	for (int i = 0; i < 50; ++i)
 	{
