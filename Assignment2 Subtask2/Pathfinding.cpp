@@ -2,7 +2,7 @@
 #include "maze.h"
 #include "Loaders.h"
 using namespace std;
-int main()
+int main(int argc, char *argv[])
 {
 	init();
 	printscr("Preprocessing...",500,500);
@@ -28,11 +28,15 @@ int main()
 	float temp = 1.0, factor=0.9, k=50.0;
 //	cout << length << '\n';
 	bool quit=false;
+	int tot=50; int once=500;
+	if (argc==3){
+		tot=stoi(argv[1]); once=stoi(argv[2]);
+	}
 	while (!quit){
-	for (int i = 1; i <= 50; ++i)   // cooling steps
+	for (int i = 1; i <= tot; ++i)   // cooling steps
 	{
 		temp *= factor;
-		for (int j = 1; j <= 500; ++j)
+		for (int j = 1; j <= once; ++j)
 		{
 			int take1 = 1 + rand() % sz;
 			int take2 = 1 + rand() % sz;
