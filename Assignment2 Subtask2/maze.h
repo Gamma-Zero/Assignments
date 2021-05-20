@@ -135,6 +135,15 @@ void shortestPath()
 	}
 }
 
+bool iscon(int val)
+{
+	int x = val % 50, y = val / 50;
+	if (x > 0 && cell[x - 1][y]) return true;
+	if (x < 49 && cell[x + 1][y]) return true;
+	if (y > 0 && cell[x][y - 1]) return true;
+	if (y < 49 && cell[x][y + 1]) return true;
+	return false;
+}
 
 void Maze()
 {
@@ -166,9 +175,9 @@ void Maze()
 		}
 		edge = edge1;
 	}
-	for(int i = 0; i < 50; ++i) for (int j = 0; j < 50; ++j) if (cell[i][j] == 0) fr1cell.push_back({ i,j });
+	for (int i = 0; i < 50; ++i) for (int j = 0; j < 50; ++j) if (cell[i][j] == 0 && iscon(50 * j + i)) fr1cell.push_back({ i,j });
 	random_shuffle(fr1cell.begin(), fr1cell.end());
-	for (int i = 0; i < (int)fr1cell.size()/4; ++i)
+	for (int i = 0; i < (int)fr1cell.size()/2; ++i)
 		cell[fr1cell[i].first][fr1cell[i].second] = 1;
 	for (int i = 0; i < 50; ++i)
 	{
