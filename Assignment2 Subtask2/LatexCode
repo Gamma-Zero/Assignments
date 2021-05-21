@@ -40,8 +40,10 @@ for i $\leftarrow$ 1 to COOLING\_STEPS do \newline
 \hspace*{1cm}exponent $\leftarrow$  $e^{-\frac{C'-C}{k \times T}}$ \newline
 \hspace*{1cm}if C' $<$ C then \newline
 \hspace*{1.5cm}S $\leftarrow$ S' \newline
+\hspace*{1.5cm}C $\leftarrow$ C' \newline
 \hspace*{1cm}else if exponent $>$ r then \newline
 \hspace*{1.5cm}S $\leftarrow$ S' \newline
+\hspace*{1.5cm}C $\leftarrow$ C' \newline
 
 
 
