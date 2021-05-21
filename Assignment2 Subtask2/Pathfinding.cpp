@@ -30,6 +30,7 @@ int main(int argc, char* argv[])
 	//	cout << length << '\n';
 	bool quit = false;
 	int tot = 50; int once = 500, curlength=length;
+	bool proceed=true;
 	if (argc == 3) {
 		tot = stoi(argv[1]); once = stoi(argv[2]);
 	}
@@ -49,6 +50,14 @@ int main(int argc, char* argv[])
 					while (SDL_PollEvent(&e)) {
 						if (e.type == SDL_QUIT) {
 							quit = true;
+						} else if (e.type == SDL_KEYDOWN){
+							switch (e.key.keysym.sym){
+								case SDLK_e:
+									proceed=(not proceed);
+									break;
+								default:
+									break;
+							}
 						}
 					}
 					SDL_Rect space = { 0,0,1000,1000 };
@@ -73,6 +82,7 @@ int main(int argc, char* argv[])
 							SDL_RenderCopy(render, cross, NULL, &temp);
 						}
 					}
+					if (!proceed) z--;
 					for (auto ii : target) {
 						int x = ii % 50; int y = ii / 50;
 						SDL_Rect temp = { 20 * x,20 * y,20,20 };
@@ -80,12 +90,13 @@ int main(int argc, char* argv[])
 					}
 					printscr("Current Best Score: ", 1000, 200);
 					printscr(to_string(length), 1000, 230);
-					printscr("Current Score: ", 1000, 260);
+					printscr("State Score: ", 1000, 260);
 					printscr(to_string(curlength), 1000, 290);
 					printscr("Temperature: ", 1000, 320);
 					printscr(to_string(temp), 1000, 350);
 					printscr("Current Iteration: ", 1000, 380);
 					printscr(to_string(j), 1000, 410);
+					if (!proceed) printscr("Paused", 1000, 430);
 					SDL_Delay(1000 / 20);
 					SDL_RenderPresent(render);
 					SDL_RenderClear(render);
