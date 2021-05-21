@@ -33,7 +33,7 @@ We generate the maze with blocked cells encoded as 0, unblocked cells encoded as
     \item 
     Kruskal's Algorithm: We have a graph of $O(N^2)$ vertices and $O(N^2)$ possible edges(edges are added between vertices with Manhattan distance 2 and if they have same x or y coordinate). We use random\_shuffle for randomizing the order of edges. To implement DSU(Disjoint Set Union), we use union by size and path compression techniques. The final algorithm runs in $O(N^2 \times logN)$.
     \item 
-    Dijkstra's Algorithm: We have implemented a Dijkstra's algorithm for each cell of the graph. The time complexity of a single run is $O(V+E) \equiv O(N \times logN + N^2)$. Since we perform a run for each cell, the final time complexity is $O(N^3 \times logN + N^4)$. To make it a bit faster, we notice that we don't need to run this for blocked cells. The time complexity remains same, but it reduces the hidden constant factors.
+    Dijkstra's Algorithm: We have implemented a Dijkstra's algorithm for each cell of the graph. The time complexity of a single run is $O(V \times logV + E) \equiv O(N^2 \times logN + N^2)$. Since we perform a run for each cell, the final time complexity is $O(N^4 \times logN + N^4)$. To make it a bit faster, we notice that we don't need to run this for blocked cells. The time complexity remains same, but it reduces the hidden constant factors.
     \item
     Shortest Path: To find the shortest path from cell $A$ to $B$, we backtrack from $B$, and change $B$ to one of its neighbours, which is closest to $A$. When $B$ becomes equal to $A$, we stop. The path length can be of the order of $O(N^2)$ in the worst case. So, the time complexity of this function is $O(N^2)$. But in practice, it is very less than this bound.
     \item
