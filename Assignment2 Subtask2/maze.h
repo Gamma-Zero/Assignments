@@ -78,6 +78,7 @@ void shortestPath()
 	{
 		int curx = i / 50, cury = i % 50;
 		swap(curx, cury);
+		if(cell[curx][cury]==0) continue;
 		dis[i][i] = 0;
 		set<pair<int, int>>s;
 		for (int j = 0; j < 2500; ++j) s.insert({ dis[i][j],j });
