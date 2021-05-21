@@ -29,19 +29,19 @@ First we generate a random order to take the treasure. Let the sequence generate
 S $\leftarrow$ randomSequence(0, 1, \dots, M-1) \newline
 C $\leftarrow$ cost(S) \newline
 for i $\leftarrow$ 1 to COOLING\_STEPS do \newline
-T $\leftarrow$ T $\times$ 0.9 \newline 
-for j $\leftarrow$ 1 to NUM\_ITER do \newline
-ind1 $\leftarrow$ random(0,M-1) \newline
-ind2 $\leftarrow$ random(0,M-1) \newline
-S' $\leftarrow$ S \newline
-swap(S'[ind1], S'[ind2]) \newline
-C' $\leftarrow$ cost(S') \newline
-r $\leftarrow$ randomFloat(0,1) \newline
-exponent $\leftarrow$  $e^{-\frac{C'-C}{k \times T}}$ \newline
-if C' $<$ C then \newline
-S $\leftarrow$ S' \newline
-else if exponent $>$ r then \newline
-S $\leftarrow$ S' \newline
+\hspace*{0.5cm}T $\leftarrow$ T $\times$ 0.9 \newline 
+\hspace*{0.5cm}for j $\leftarrow$ 1 to NUM\_ITER do \newline
+\hspace*{1cm}ind1 $\leftarrow$ random(0,M-1) \newline
+\hspace*{1cm}ind2 $\leftarrow$ random(0,M-1) \newline
+\hspace*{1cm}S' $\leftarrow$ S \newline
+\hspace*{1cm}swap(S'[ind1], S'[ind2]) \newline
+\hspace*{1cm}C' $\leftarrow$ cost(S') \newline
+\hspace*{1cm}r $\leftarrow$ randomFloat(0,1) \newline
+\hspace*{1cm}exponent $\leftarrow$  $e^{-\frac{C'-C}{k \times T}}$ \newline
+\hspace*{1cm}if C' $<$ C then \newline
+\hspace*{1.5cm}S $\leftarrow$ S' \newline
+\hspace*{1cm}else if exponent $>$ r then \newline
+\hspace*{1.5cm}S $\leftarrow$ S' \newline
 
 
 
