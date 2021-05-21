@@ -53,8 +53,8 @@ We generate the maze with blocked cells encoded as 0, unblocked cells encoded as
 
 \section{Pictures and Video from the Simulation}
 Link for a video of the simulation: \href{https://drive.google.com/file/d/1DukXnlQnckIreqGcq1YgvXhY7S5w78Bn/view?usp=sharing}{Link (Click)}
-\\
-Preprocessing: \\
+\newpage
+Preprocessing: \\ \\
 \includegraphics[width = 12 cm]{preprocessing.png} \newpage
 First Iteration: \\ \\
 \includegraphics[width = 12 cm]{firstiter.png} \newpage
